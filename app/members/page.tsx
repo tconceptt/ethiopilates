@@ -237,7 +237,7 @@ export default function Members() {
                               )}
                             </td>
                             <td className="py-4 px-6 align-top font-medium text-stone-800">
-                              {reg.price > 0 ? `${reg.price.toLocaleString()} ETB` : 'N/A'}
+                              {(reg.price ?? 0) > 0 ? `${(reg.price ?? 0).toLocaleString()} ETB` : 'N/A'}
                             </td>
                             <td className="py-4 px-6 align-top">
                               {reg.status === "paid" && (
@@ -334,7 +334,7 @@ export default function Members() {
                           </div>
                           <div>
                             <p className="text-stone-500 text-xs uppercase tracking-wider mb-1">Amount</p>
-                            <p className="font-medium text-stone-800">{reg.price > 0 ? `${reg.price.toLocaleString()} ETB` : 'N/A'}</p>
+                            <p className="font-medium text-stone-800">{(reg.price ?? 0) > 0 ? `${(reg.price ?? 0).toLocaleString()} ETB` : 'N/A'}</p>
                           </div>
                         </div>
 
