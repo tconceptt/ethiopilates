@@ -142,11 +142,11 @@ export default function Pricing() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: idx * 0.2 }}
-                className={`bg-white p-8 rounded-sm shadow-sm border-t-4 ${idx === 1 ? 'border-primary' : 'border-secondary'}`}
+                className={`bg-white p-8 rounded-sm shadow-sm border-t-4 flex flex-col h-full ${idx === 1 ? 'border-primary' : 'border-secondary'}`}
               >
                 <h4 className="font-serif text-2xl text-primary-dark mb-2">{membership.title}</h4>
                 <p className="text-sm text-stone-500 mb-6 pb-6 border-b border-stone-100">{membership.subtitle}</p>
-                <ul className="space-y-4 mb-8">
+                <ul className="space-y-4 mb-8 flex-grow">
                   {membership.prices.map((price, pIdx) => (
                     <li key={pIdx} className="flex justify-between items-center">
                       <span className="text-stone-600 font-medium">{price.duration}</span>
@@ -157,7 +157,7 @@ export default function Pricing() {
                     </li>
                   ))}
                 </ul>
-                <Link href="/register" className={`block text-center py-3 rounded-sm text-sm uppercase tracking-widest transition-colors ${idx === 1 ? 'bg-primary text-white hover:bg-primary-dark' : 'bg-secondary/30 text-primary-dark hover:bg-secondary/50'}`}>
+                <Link href="/register" className={`block text-center py-3 rounded-sm text-sm uppercase tracking-widest transition-colors mt-auto ${idx === 1 ? 'bg-primary text-white hover:bg-primary-dark' : 'bg-secondary/30 text-primary-dark hover:bg-secondary/50'}`}>
                   Select Package
                 </Link>
               </motion.div>
