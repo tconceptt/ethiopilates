@@ -3,13 +3,12 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { ArrowLeft, CheckCircle2 } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import Image from "next/image";
 import { useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 
 export default function Register() {
-  const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   const createRegistration = useMutation(api.registrations.create);
@@ -29,6 +28,19 @@ export default function Register() {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  const getPriceForPackage = (pkg: string) => {
+    const prices: Record<string, number> = {
+      "standard-1m": 20000,
+      "standard-3m": 42000,
+      "standard-6m": 84000,
+      "standard-1y": 150000,
+      "premium-1m": 45000,
+      "premium-3m": 130000,
+      "premium-6m": 200000,
+    };
+    return prices[pkg] || 0;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -36,12 +48,13 @@ export default function Register() {
     try {
       await createRegistration({
         ...formData,
+        price: getPriceForPackage(formData.package),
         email: formData.email || undefined,
         goals: formData.goals || undefined,
       });
       
-      setIsSubmitted(true);
-      window.scrollTo(0, 0);
+      alert("Registration Successful!");
+      window.location.reload();
     } catch (error) {
       console.error("Failed to submit registration:", error);
       alert("Something went wrong. Please try again.");
@@ -73,28 +86,6 @@ export default function Register() {
       <main className="flex-grow py-12 px-6">
         <div className="container mx-auto max-w-3xl">
           
-          {isSubmitted ? (
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="bg-white rounded-sm shadow-md p-12 text-center"
-            >
-              <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <CheckCircle2 size={40} className="text-green-600" />
-              </div>
-              <h1 className="font-serif text-4xl text-primary-dark mb-4">Registration Successful</h1>
-              <p className="text-stone-600 mb-8 max-w-md mx-auto leading-relaxed">
-                Thank you for choosing Ethio Pilates. We have received your registration details. 
-                Our team will contact you shortly to confirm your booking and process your payment.
-              </p>
-              <Link 
-                href="/"
-                className="inline-block bg-primary hover:bg-primary-dark text-white px-8 py-3 rounded-sm text-sm uppercase tracking-widest transition-colors"
-              >
-                Return to Homepage
-              </Link>
-            </motion.div>
-          ) : (
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -256,7 +247,6 @@ export default function Register() {
                 </p>
               </form>
             </motion.div>
-          )}
         </div>
       </main>
     </div>
