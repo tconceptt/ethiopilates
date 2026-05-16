@@ -138,7 +138,7 @@ export default function Members() {
   const totalMembers = registrations?.filter(r => r.status !== "cancelled").length || 0;
   const totalPayment = registrations
     ?.filter(r => r.status === "paid" && r.price)
-    .reduce((sum, r) => sum + r.price, 0) || 0;
+    .reduce((sum, r) => sum + (r.price || 0), 0) || 0;
 
   return (
     <div className="min-h-screen bg-secondary/20 flex flex-col">
