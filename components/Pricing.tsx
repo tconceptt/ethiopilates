@@ -9,11 +9,11 @@ export default function Pricing() {
       title: "Standard Access",
       subtitle: "Yoga + Hot Pilates",
       prices: [
-        { duration: "Drop IN", price: "5,000" },
-        { duration: "1 Month", price: "20,000" },
-        { duration: "3 Months", price: "42,000" },
-        { duration: "6 Months", price: "84,000" },
-        { duration: "1 Year", price: "150,000" },
+        { duration: "Drop IN", price: "5,000", note: undefined },
+        { duration: "1 Month", price: "20,000", note: undefined },
+        { duration: "3 Months", price: "42,000", note: undefined },
+        { duration: "6 Months", price: "84,000", note: undefined },
+        { duration: "1 Year", price: "150,000", note: undefined },
       ],
       unlimited: true
     },
@@ -33,7 +33,7 @@ export default function Pricing() {
     {
       title: "Hot Pilates",
       prices: [
-        { duration: "Drop-in", price: "4,000" },
+        { duration: "Drop-in", price: "4,000", note: undefined },
         { duration: "1 Month", price: "12,000", note: "4 class" },
         { duration: "3 Months", price: "28,000", note: "8 class" },
         { duration: "6 Months", price: "55,000", note: "16 class" },
@@ -43,17 +43,17 @@ export default function Pricing() {
     {
       title: "Reformer Pilates",
       prices: [
-        { duration: "Drop-in", price: "5,500" },
+        { duration: "Drop-in", price: "5,500", note: undefined },
         { duration: "1 Month", price: "20,000", note: "4 class" },
         { duration: "3 Months", price: "60,000", note: "12 class" },
         { duration: "6 Months", price: "120,000", note: "24 class" },
-        { duration: "1 Year", price: "200,000" },
+        { duration: "1 Year", price: "200,000", note: undefined },
       ]
     },
     {
       title: "Mat Pilates",
       prices: [
-        { duration: "Drop-in", price: "3,000" },
+        { duration: "Drop-in", price: "3,000", note: undefined },
         { duration: "1 Month", price: "22,000", note: "8 class" },
         { duration: "3 Months", price: "65,000", note: "24 class" },
         { duration: "6 Months", price: "100,000", note: "48 class" },
@@ -63,7 +63,7 @@ export default function Pricing() {
     {
       title: "Yoga",
       prices: [
-        { duration: "Drop-in", price: "3,000" },
+        { duration: "Drop-in", price: "3,000", note: undefined },
         { duration: "1 Month", price: "10,000", note: "4 class" },
         { duration: "3 Months", price: "20,000", note: "8 class" },
         { duration: "6 Months", price: "40,000", note: "16 class" },
@@ -76,28 +76,28 @@ export default function Pricing() {
     {
       title: "Pregnancy Yoga",
       prices: [
-        { duration: "Drop-in", price: "3,500" },
-        { duration: "1 Month", price: "6,000 ETB" },
-        { duration: "3 Months", price: "14,000 ETB" },
-        { duration: "6 Months", price: "30,000 ETB" },
+        { duration: "Drop-in", price: "3,500", note: undefined },
+        { duration: "1 Month", price: "6,000 ETB", note: undefined },
+        { duration: "3 Months", price: "14,000 ETB", note: undefined },
+        { duration: "6 Months", price: "30,000 ETB", note: undefined },
       ]
     },
     {
       title: "Kids / Beginner Ballet",
       prices: [
-        { duration: "Drop-in", price: "1,500" },
-        { duration: "1 Month", price: "3,500" },
-        { duration: "3 Months", price: "9,500" },
-        { duration: "6 Months", price: "17,000" },
-        { duration: "1 Year", price: "32,000" },
+        { duration: "Drop-in", price: "1,500", note: undefined },
+        { duration: "1 Month", price: "3,500", note: undefined },
+        { duration: "3 Months", price: "9,500", note: undefined },
+        { duration: "6 Months", price: "17,000", note: undefined },
+        { duration: "1 Year", price: "32,000", note: undefined },
       ]
     },
     {
       title: "VIP / Private Training",
       subtitle: "Free water, matcha",
       prices: [
-        { duration: "1 Session", price: "10,000" },
-        { duration: "4 Sessions", price: "30,000" },
+        { duration: "1 Session", price: "10,000", note: undefined },
+        { duration: "4 Sessions", price: "30,000", note: undefined },
       ]
     }
   ];
