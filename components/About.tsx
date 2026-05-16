@@ -2,7 +2,6 @@
 
 import { motion } from "framer-motion";
 import { Leaf, Heart, Wind, Sparkles } from "lucide-react";
-import Image from "next/image";
 
 export default function About() {
   const features = [
@@ -31,10 +30,10 @@ export default function About() {
   return (
     <section id="about" className="py-24 bg-white">
       <div className="container mx-auto px-6 md:px-12">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+        <div className="max-w-4xl mx-auto text-center">
           <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
           >
@@ -42,50 +41,33 @@ export default function About() {
               This is not just fitness.<br />
               <span className="italic text-primary">It&apos;s a lifestyle.</span>
             </h2>
-            <div className="w-16 h-px bg-primary mb-8"></div>
+            <div className="w-16 h-px bg-primary mx-auto mb-10"></div>
             
-            <p className="text-stone-600 mb-6 leading-relaxed">
-              At Ethio Pilates, we go beyond workouts to create meaningful experiences. 
-              Whether you are a beginner, an expecting mother, or someone seeking stress relief, 
-              our studio is designed for you.
+            <p className="text-stone-600 mb-6 leading-relaxed text-lg">
+              Step into a sanctuary designed to celebrate and elevate the female body and spirit. 
+              We&apos;ve cultivated a safe, supportive environment where women can build strength, find balance, 
+              and embrace their wellness journey with confidence.
             </p>
             
-            <p className="text-stone-600 mb-10 leading-relaxed">
-              We offer self-awareness sessions, guided reflections, and mindfulness practices 
-              to deepen your connection with yourself. Join our community to find a balance of 
-              movement, wellness, and unique experiences beyond traditional fitness.
+            <p className="text-stone-600 mb-16 leading-relaxed text-lg">
+              Whether you are a beginner, an expecting mother, or simply seeking a peaceful retreat from daily life, 
+              our studio is a space for you to thrive alongside a community of like-minded women. We offer 
+              self-awareness sessions, guided reflections, and mindfulness practices to deepen your connection with yourself.
             </p>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-10 text-left">
               {features.map((feature, index) => (
-                <div key={index} className="flex gap-4">
-                  <div className="mt-1 bg-secondary/30 p-2 rounded-full h-fit">
+                <div key={index} className="flex gap-4 items-start">
+                  <div className="mt-1 bg-secondary/30 p-3 rounded-full h-fit">
                     {feature.icon}
                   </div>
                   <div>
                     <h3 className="font-serif text-xl text-primary-dark mb-2">{feature.title}</h3>
-                    <p className="text-sm text-stone-500">{feature.description}</p>
+                    <p className="text-sm text-stone-500 leading-relaxed">{feature.description}</p>
                   </div>
                 </div>
               ))}
             </div>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="relative h-[600px] rounded-t-full overflow-hidden shadow-xl"
-          >
-            <Image 
-              src="https://images.unsplash.com/photo-1599901860904-17e6ed7083a0?q=80&w=2070&auto=format&fit=crop" 
-              alt="Pilates Studio Environment" 
-              fill
-              sizes="(max-width: 1024px) 100vw, 50vw"
-              className="object-cover"
-            />
-            <div className="absolute inset-0 bg-primary/10 mix-blend-multiply"></div>
           </motion.div>
         </div>
       </div>

@@ -1,38 +1,31 @@
 "use client";
 
 import { motion } from "framer-motion";
-import Image from "next/image";
 
 const services = [
   {
     title: "Mat Pilates",
-    description: "A foundation-based class using your body weight to build core strength, improve posture, and enhance flexibility. Perfect for beginners and mindful movement.",
-    image: "https://images.unsplash.com/photo-1518611012118-696072aa579a?q=80&w=800&auto=format&fit=crop"
+    description: "A foundation-based class using your body weight to build core strength, improve posture, and enhance flexibility. Perfect for beginners and mindful movement."
   },
   {
     title: "Reformer Pilates",
-    description: "A refined, equipment-based workout using the reformer machine to sculpt, tone, and strengthen your entire body with precision and control.",
-    image: "https://images.unsplash.com/photo-1616803689943-5601631c7fec?q=80&w=800&auto=format&fit=crop"
+    description: "A refined, equipment-based workout using the reformer machine to sculpt, tone, and strengthen your entire body with precision and control."
   },
   {
     title: "Hot Pilates",
-    description: "A dynamic Pilates session performed in a heated room to increase intensity, improve flexibility, and boost circulation while strengthening the body.",
-    image: "https://images.unsplash.com/photo-1575052814086-f385e2e2ad1b?q=80&w=800&auto=format&fit=crop"
+    description: "A dynamic Pilates session performed in a heated room to increase intensity, improve flexibility, and boost circulation while strengthening the body."
   },
   {
     title: "Yoga",
-    description: "Flow, stretch, and reconnect through calming and energizing yoga sessions designed to improve flexibility, reduce stress, and bring mental clarity.",
-    image: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?q=80&w=800&auto=format&fit=crop"
+    description: "Flow, stretch, and reconnect through calming and energizing yoga sessions designed to improve flexibility, reduce stress, and bring mental clarity."
   },
   {
     title: "Pregnancy Yoga",
-    description: "Gentle, supportive classes designed for mothers-to-be. Focused on safe movement, breathing techniques, and relaxation.",
-    image: "https://images.unsplash.com/photo-1515023115689-589c33041d3c?q=80&w=800&auto=format&fit=crop"
+    description: "Gentle, supportive classes designed for mothers-to-be. Focused on safe movement, breathing techniques, and relaxation."
   },
   {
     title: "Refreshing Events",
-    description: "Relaxing and uplifting experiences designed to help you reset, recharge, and reconnect with yourself and the community.",
-    image: "https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=800&auto=format&fit=crop"
+    description: "Relaxing and uplifting experiences designed to help you reset, recharge, and reconnect with yourself and the community."
   }
 ];
 
@@ -74,20 +67,10 @@ export default function Services() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="group cursor-pointer bg-white rounded-sm overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+              className="group cursor-pointer bg-white rounded-sm shadow-sm hover:shadow-md transition-shadow border border-stone-100 h-full"
             >
-              <div className="relative h-64 overflow-hidden">
-                <Image 
-                  src={service.image} 
-                  alt={service.title} 
-                  fill
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  className="object-cover transition-transform duration-700 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-primary/20 mix-blend-multiply opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-              </div>
-              <div className="p-8">
-                <h3 className="font-serif text-2xl text-primary-dark mb-3">{service.title}</h3>
+              <div className="p-10 h-full flex flex-col justify-center">
+                <h3 className="font-serif text-2xl text-primary-dark mb-4 group-hover:text-primary transition-colors">{service.title}</h3>
                 <p className="text-stone-600 text-sm leading-relaxed">
                   {service.description}
                 </p>

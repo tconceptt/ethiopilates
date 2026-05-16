@@ -2,23 +2,10 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import Image from "next/image";
 
 export default function Hero() {
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-secondary/30">
-      {/* Background Image - using a placeholder that feels like pilates/yoga */}
-      <div className="absolute inset-0 z-0 opacity-40">
-        <Image
-          src="https://images.unsplash.com/photo-1518611012118-696072aa579a?q=80&w=2070&auto=format&fit=crop"
-          alt="Pilates Studio"
-          fill
-          className="object-cover"
-          priority
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-background/60 to-background"></div>
-      </div>
-
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-b from-secondary/40 to-background">
       <div className="container mx-auto px-6 relative z-10 text-center mt-20">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
