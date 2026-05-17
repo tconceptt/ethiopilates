@@ -9,11 +9,11 @@ export default function Pricing() {
       title: "Standard Access",
       subtitle: "Yoga + Hot Pilates",
       prices: [
-        { duration: "Drop IN", price: "5,000", note: undefined },
-        { duration: "1 Month", price: "20,000", note: undefined },
-        { duration: "3 Months", price: "42,000", note: undefined },
-        { duration: "6 Months", price: "84,000", note: undefined },
-        { duration: "1 Year", price: "150,000", note: undefined },
+        { duration: "Drop IN", price: "2,500", note: undefined },
+        { duration: "1 Month", price: "8,000", note: undefined },
+        { duration: "3 Months", price: "20,000", note: undefined },
+        { duration: "6 Months", price: "35,000", note: undefined },
+        { duration: "1 Year", price: "55,000", note: undefined },
       ],
       unlimited: true
     },
@@ -21,9 +21,9 @@ export default function Pricing() {
       title: "Premium Access",
       subtitle: "Yoga + Mat Pilates + Hot Pilates + Reformer",
       prices: [
-        { duration: "1 Month", price: "45,000", note: "one class per week for each service" },
-        { duration: "3 Months", price: "130,000", note: "4 class for each service" },
-        { duration: "6 Months", price: "200,000", note: "8 class for each service" },
+        { duration: "1 Month", price: "35,000", note: "one class per week for each service" },
+        { duration: "3 Months", price: "80,000", note: "4 class for each service" },
+        { duration: "6 Months", price: "130,000", note: "8 class for each service" },
       ],
       unlimited: false
     }
@@ -33,41 +33,41 @@ export default function Pricing() {
     {
       title: "Hot Pilates",
       prices: [
-        { duration: "Drop-in", price: "4,000", note: undefined },
-        { duration: "1 Month", price: "12,000", note: "4 class" },
-        { duration: "3 Months", price: "28,000", note: "8 class" },
-        { duration: "6 Months", price: "55,000", note: "16 class" },
-        { duration: "1 Year", price: "110,000", note: "32 class" },
+        { duration: "Drop-in", price: "2,000", note: undefined },
+        { duration: "1 Month", price: "6,000", note: "4 class" },
+        { duration: "3 Months", price: "10,000", note: "8 class" },
+        { duration: "6 Months", price: "15,000", note: "16 class" },
+        { duration: "1 Year", price: "20,000", note: "32 class" },
       ]
     },
     {
       title: "Reformer Pilates",
       prices: [
-        { duration: "Drop-in", price: "5,500", note: undefined },
-        { duration: "1 Month", price: "20,000", note: "4 class" },
-        { duration: "3 Months", price: "60,000", note: "12 class" },
-        { duration: "6 Months", price: "120,000", note: "24 class" },
-        { duration: "1 Year", price: "200,000", note: undefined },
+        { duration: "Drop-in", price: "4,500", note: undefined },
+        { duration: "1 Month", price: "15,000", note: "4 class" },
+        { duration: "3 Months", price: "35,000", note: "12 class" },
+        { duration: "6 Months", price: "50,000", note: "24 class" },
+        { duration: "1 Year", price: "80,000", note: undefined },
       ]
     },
     {
       title: "Mat Pilates",
       prices: [
-        { duration: "Drop-in", price: "3,000", note: undefined },
-        { duration: "1 Month", price: "22,000", note: "8 class" },
-        { duration: "3 Months", price: "65,000", note: "24 class" },
-        { duration: "6 Months", price: "100,000", note: "48 class" },
-        { duration: "1 Year", price: "180,000", note: "96 class" },
+        { duration: "Drop-in", price: "2,000", note: undefined },
+        { duration: "1 Month", price: "10,000", note: "8 class" },
+        { duration: "3 Months", price: "25,000", note: "24 class" },
+        { duration: "6 Months", price: "40,000", note: "48 class" },
+        { duration: "1 Year", price: "60,000", note: "96 class" },
       ]
     },
     {
       title: "Yoga",
       prices: [
-        { duration: "Drop-in", price: "3,000", note: undefined },
-        { duration: "1 Month", price: "10,000", note: "4 class" },
-        { duration: "3 Months", price: "20,000", note: "8 class" },
-        { duration: "6 Months", price: "40,000", note: "16 class" },
-        { duration: "1 Year", price: "90,000", note: "32 class" },
+        { duration: "Drop-in", price: "2,000", note: undefined },
+        { duration: "1 Month", price: "6,000", note: "4 class" },
+        { duration: "3 Months", price: "10,000", note: "8 class" },
+        { duration: "6 Months", price: "15,000", note: "16 class" },
+        { duration: "1 Year", price: "20,000", note: "32 class" },
       ]
     }
   ];
@@ -76,10 +76,10 @@ export default function Pricing() {
     {
       title: "Pregnancy Yoga",
       prices: [
-        { duration: "Drop-in", price: "3,500", note: undefined },
-        { duration: "1 Month", price: "6,000 ETB", note: undefined },
-        { duration: "3 Months", price: "14,000 ETB", note: undefined },
-        { duration: "6 Months", price: "30,000 ETB", note: undefined },
+        { duration: "Drop-in", price: "2,500", note: undefined },
+        { duration: "1 Month", price: "8,000", note: undefined },
+        { duration: "3 Months", price: "20,000", note: undefined },
+        { duration: "6 Months", price: "30,000", note: undefined },
       ]
     },
     {
@@ -94,7 +94,7 @@ export default function Pricing() {
     },
     {
       title: "VIP / Private Training",
-      subtitle: "Free water, matcha",
+      subtitle: "Free infused water, matcha",
       prices: [
         { duration: "1 Session", price: "10,000", note: undefined },
         { duration: "4 Sessions", price: "30,000", note: undefined },

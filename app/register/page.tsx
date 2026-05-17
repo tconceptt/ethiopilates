@@ -30,13 +30,13 @@ export default function Register() {
 
   const getPriceForPackage = (pkg: string) => {
     const prices: Record<string, number> = {
-      "standard-1m": 20000,
-      "standard-3m": 42000,
-      "standard-6m": 84000,
-      "standard-1y": 150000,
-      "premium-1m": 45000,
-      "premium-3m": 130000,
-      "premium-6m": 200000,
+      "standard-1m": 8000,
+      "standard-3m": 20000,
+      "standard-6m": 35000,
+      "standard-1y": 55000,
+      "premium-1m": 35000,
+      "premium-3m": 80000,
+      "premium-6m": 130000,
     };
     return prices[pkg] || 0;
   };
@@ -180,15 +180,15 @@ export default function Register() {
                       >
                         <option value="" disabled>Select an option</option>
                         <optgroup label="Core Memberships">
-                          <option value="standard-1m">Standard Access - 1 Month (20,000 ETB)</option>
-                          <option value="standard-3m">Standard Access - 3 Months (42,000 ETB)</option>
-                          <option value="standard-6m">Standard Access - 6 Months (84,000 ETB)</option>
-                          <option value="standard-1y">Standard Access - 1 Year (150,000 ETB)</option>
+                          <option value="standard-1m">Standard Access - 1 Month (8,000 ETB)</option>
+                          <option value="standard-3m">Standard Access - 3 Months (20,000 ETB)</option>
+                          <option value="standard-6m">Standard Access - 6 Months (35,000 ETB)</option>
+                          <option value="standard-1y">Standard Access - 1 Year (55,000 ETB)</option>
                         </optgroup>
                         <optgroup label="Premium Memberships">
-                          <option value="premium-1m">Premium Access - 1 Month (45,000 ETB)</option>
-                          <option value="premium-3m">Premium Access - 3 Months (130,000 ETB)</option>
-                          <option value="premium-6m">Premium Access - 6 Months (200,000 ETB)</option>
+                          <option value="premium-1m">Premium Access - 1 Month (35,000 ETB)</option>
+                          <option value="premium-3m">Premium Access - 3 Months (80,000 ETB)</option>
+                          <option value="premium-6m">Premium Access - 6 Months (130,000 ETB)</option>
                         </optgroup>
                         <optgroup label="Class Packages">
                           <option value="hot-pilates">Hot Pilates</option>
