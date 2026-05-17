@@ -54,7 +54,7 @@ export default function Hero() {
               Book Your Class
             </Link>
             <Link
-              href="#services"
+              href="/#services"
               className="bg-transparent border border-primary text-primary hover:bg-primary/5 px-8 py-4 rounded-sm text-sm uppercase tracking-widest transition-all duration-300"
             >
               Explore Services
