@@ -180,15 +180,15 @@ export default function Register() {
                       >
                         <option value="" disabled>Select an option</option>
                         <optgroup label="Core Memberships">
-                          <option value="standard-1m">Standard Access - 1 Month (8,000 ETB)</option>
-                          <option value="standard-3m">Standard Access - 3 Months (20,000 ETB)</option>
-                          <option value="standard-6m">Standard Access - 6 Months (35,000 ETB)</option>
-                          <option value="standard-1y">Standard Access - 1 Year (55,000 ETB)</option>
+                          <option value="standard-1m">Standard Access 1 Month (8,000 ETB)</option>
+                          <option value="standard-3m">Standard Access 3 Months (20,000 ETB)</option>
+                          <option value="standard-6m">Standard Access 6 Months (35,000 ETB)</option>
+                          <option value="standard-1y">Standard Access 1 Year (55,000 ETB)</option>
                         </optgroup>
                         <optgroup label="Premium Memberships">
-                          <option value="premium-1m">Premium Access - 1 Month (35,000 ETB)</option>
-                          <option value="premium-3m">Premium Access - 3 Months (80,000 ETB)</option>
-                          <option value="premium-6m">Premium Access - 6 Months (130,000 ETB)</option>
+                          <option value="premium-1m">Premium Access 1 Month (35,000 ETB)</option>
+                          <option value="premium-3m">Premium Access 3 Months (80,000 ETB)</option>
+                          <option value="premium-6m">Premium Access 6 Months (130,000 ETB)</option>
                         </optgroup>
                         <optgroup label="Class Packages">
                           <option value="hot-pilates">Hot Pilates</option>
