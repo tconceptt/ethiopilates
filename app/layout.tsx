@@ -28,9 +28,9 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${cormorant.variable} ${lato.variable} scroll-smooth`}
+      className={`${cormorant.variable} ${lato.variable} scroll-smooth overflow-x-hidden`}
     >
-      <body className="font-sans antialiased text-stone-800 bg-[#FAF9F6]">
+      <body className="font-sans antialiased text-stone-800 bg-[#FAF9F6] overflow-x-hidden">
         <ConvexClientProvider>{children}</ConvexClientProvider>
       </body>
     </html>
