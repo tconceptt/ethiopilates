@@ -9,7 +9,8 @@ export default defineSchema({
     phone: v.string(),
     package: v.string(),
     price: v.optional(v.number()),
-    experienceLevel: v.string(),
+    schedule: v.optional(v.string()),
+    experienceLevel: v.optional(v.string()),
     goals: v.optional(v.string()),
     status: v.string(), // e.g., "pending", "contacted", "paid", "cancelled"
     createdAt: v.number(),

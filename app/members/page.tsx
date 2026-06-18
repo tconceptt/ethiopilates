@@ -208,7 +208,7 @@ export default function Members() {
                         <tr className="bg-stone-50">
                           <th className="py-4 px-6 border-b border-stone-200 text-xs font-semibold text-stone-500 uppercase tracking-wider">Date</th>
                           <th className="py-4 px-6 border-b border-stone-200 text-xs font-semibold text-stone-500 uppercase tracking-wider">Name / Contact</th>
-                          <th className="py-4 px-6 border-b border-stone-200 text-xs font-semibold text-stone-500 uppercase tracking-wider">Package Details</th>
+                          <th className="py-4 px-6 border-b border-stone-200 text-xs font-semibold text-stone-500 uppercase tracking-wider">Class & Schedule</th>
                           <th className="py-4 px-6 border-b border-stone-200 text-xs font-semibold text-stone-500 uppercase tracking-wider">Price</th>
                           <th className="py-4 px-6 border-b border-stone-200 text-xs font-semibold text-stone-500 uppercase tracking-wider">Status</th>
                           <th className="py-4 px-6 border-b border-stone-200 text-xs font-semibold text-stone-500 uppercase tracking-wider text-right">Actions</th>
@@ -229,7 +229,9 @@ export default function Members() {
                               <span className="inline-block bg-primary/10 text-primary-dark px-2.5 py-1 rounded text-xs font-medium border border-primary/20 mb-1">
                                 {reg.package}
                               </span>
-                              <div className="text-xs text-stone-500 mt-1 capitalize">Level: {reg.experienceLevel}</div>
+                              {reg.schedule && (
+                                <div className="text-xs text-stone-600 mt-1.5">{reg.schedule}</div>
+                              )}
                               {reg.goals && (
                                 <p className="text-xs text-stone-500 mt-2 truncate max-w-[200px]" title={reg.goals}>
                                   Goal: {reg.goals}
@@ -339,10 +341,13 @@ export default function Members() {
                         </div>
 
                         <div className="mb-4">
-                          <p className="text-stone-500 text-xs uppercase tracking-wider mb-1">Package</p>
+                          <p className="text-stone-500 text-xs uppercase tracking-wider mb-1">Class</p>
                           <span className="inline-block bg-primary/10 text-primary-dark px-2.5 py-1 rounded text-xs font-medium border border-primary/20">
                             {reg.package}
                           </span>
+                          {reg.schedule && (
+                            <p className="text-sm text-stone-600 mt-2">{reg.schedule}</p>
+                          )}
                         </div>
 
                         <div className="flex flex-wrap gap-2 pt-4 border-t border-stone-100">
