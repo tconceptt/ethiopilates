@@ -105,8 +105,8 @@ const CLASSES: Record<ClassKey, ClassInfo> = {
     label: "Mat Pilates",
     blurb: "Mat-based Pilates focused on core strength and control.",
     schedule: {
-      Mon: ["9:00–10:00 AM", "6:00–7:00 PM"],
-      Thu: ["9:00–10:00 AM", "6:00–7:00 PM"],
+      Mon: ["9:00–10:00 AM", "5:00–6:00 PM"],
+      Thu: ["9:00–10:00 AM", "5:00–6:00 PM"],
     },
   },
   "hot-pilates": {
@@ -122,19 +122,19 @@ const CLASSES: Record<ClassKey, ClassInfo> = {
     },
   },
   yoga: {
-    label: "Yoga",
+    label: "Heran's Yoga",
     blurb: "Calming, restorative flows to stretch and reset.",
     schedule: {
-      Mon: ["8:00–9:00 AM"],
-      Thu: ["8:00–9:00 AM"],
+      Mon: ["10:00–11:30 AM"],
+      Thu: ["10:00–11:30 AM"],
     },
   },
   "pregnancy-yoga": {
     label: "Pregnancy Yoga",
     blurb: "Gentle, supportive sessions tailored for mothers-to-be.",
     schedule: {
-      Mon: ["10:30 AM–12:00 PM (Private)", "5:00–6:00 PM (Group)"],
-      Thu: ["10:30 AM–12:00 PM (Private)", "5:00–6:00 PM (Group)"],
+      Mon: ["6:00–7:00 PM"],
+      Thu: ["6:00–7:00 PM"],
     },
   },
 };
@@ -308,10 +308,10 @@ export default function Register() {
             className="bg-white rounded-sm shadow-md overflow-hidden"
           >
             <div className="bg-primary-dark p-6 sm:p-8 text-center text-white relative overflow-hidden">
-              <div className="absolute inset-0 opacity-20">
+              <div className="absolute inset-0 opacity-25">
                 <Image
-                  src="https://images.unsplash.com/photo-1518611012118-696072aa579a?q=80&w=2070&auto=format&fit=crop"
-                  alt="Background"
+                  src="/studio/reformer-room.jpg"
+                  alt="The Ethio Pilates reformer hall"
                   fill
                   sizes="(max-width: 768px) 100vw, 800px"
                   className="object-cover"

@@ -3,7 +3,10 @@ import Hero from "@/components/Hero";
 import About from "@/components/About";
 import StudioVideo from "@/components/StudioVideo";
 import Services from "@/components/Services";
+import Amenities from "@/components/Amenities";
+import Schedule from "@/components/Schedule";
 import Pricing from "@/components/Pricing";
+import CtaBand from "@/components/CtaBand";
 import Footer from "@/components/Footer";
 
 export default function Home() {
@@ -11,10 +14,13 @@ export default function Home() {
     <main className="min-h-screen">
       <Navbar />
       <Hero />
-      <StudioVideo />
       <About />
+      <StudioVideo />
       <Services />
+      <Amenities />
+      <Schedule />
       <Pricing />
+      <CtaBand />
       <Footer />
     </main>
   );

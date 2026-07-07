@@ -4,60 +4,73 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 
+const EASE = [0.16, 1, 0.3, 1] as const;
+
 export default function Hero() {
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-secondary/30">
-      {/* Background Image - using a placeholder that feels like pilates/yoga */}
-      <div className="absolute inset-0 z-0 opacity-40">
+    <section className="relative min-h-[100svh] flex items-end overflow-hidden bg-foreground">
+      <div className="absolute inset-0 z-0">
         <Image
-          src="https://images.unsplash.com/photo-1518611012118-696072aa579a?q=80&w=2070&auto=format&fit=crop"
-          alt="Pilates Studio"
+          src="/studio/class-reformer.jpg"
+          alt="A reformer class in session at Ethio Pilates Studio, legs lifted in unison beneath the brass 'Who run the world' wall"
           fill
-          className="object-cover"
+          className="object-cover object-center"
           priority
+          sizes="100vw"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-background/60 to-background"></div>
+        {/* Espresso scrim, bottom-weighted, for text legibility only */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#241a13]/95 via-[#241a13]/45 to-[#241a13]/10"></div>
+        {/* Top scrim so the nav stays readable over the bright ceiling */}
+        <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-[#241a13]/70 to-transparent"></div>
       </div>
 
-      <div className="container mx-auto px-6 relative z-10 text-center mt-20">
+      <div className="container mx-auto px-6 md:px-12 relative z-10 pb-16 md:pb-24 pt-40">
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, ease: "easeOut" }}
-          className="max-w-3xl mx-auto"
+          transition={{ duration: 1, ease: EASE }}
+          className="max-w-4xl"
         >
-          <h1 className="font-serif text-5xl md:text-7xl text-primary-dark mb-6 leading-tight">
-            Move with intention. <br className="hidden md:block" />
-            <span className="italic text-primary">Feel the transformation.</span>
+          <p className="text-[#e8d5ae] text-sm md:text-base tracking-[0.35em] uppercase mb-6">
+            Move &middot; Breathe &middot; Thrive
+          </p>
+
+          <h1 className="font-serif text-5xl sm:text-6xl md:text-7xl lg:text-[5.5rem] text-[#faf6ee] leading-[1.02] mb-8">
+            Move with intention.
+            <br />
+            <span className="italic font-light text-[#dcc188]">
+              Feel the transformation.
+            </span>
           </h1>
-          
-          <motion.p 
+
+          <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 1, delay: 0.5 }}
-            className="text-lg md:text-xl text-stone-600 mb-10 font-light leading-relaxed max-w-2xl mx-auto"
+            transition={{ duration: 1, delay: 0.4, ease: EASE }}
+            className="text-base md:text-lg text-[#efe7d8] mb-10 font-light leading-relaxed max-w-xl"
           >
-            Ethio Pilates is more than a studio&mdash;it&apos;s a space for movement, healing, and self-connection. 
-            We combine Pilates, yoga, and curated wellness experiences to help you feel strong, balanced, and refreshed.
+            A women-only sanctuary in Addis Ababa for Pilates, yoga, and
+            recovery &mdash; a space to build strength, find balance, and
+            breathe.
           </motion.p>
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.8 }}
-            className="flex flex-col sm:flex-row gap-4 justify-center"
+            transition={{ duration: 0.8, delay: 0.6, ease: EASE }}
+            className="flex flex-col sm:flex-row gap-4"
           >
             <Link
               href="/register"
-              className="bg-primary hover:bg-primary-dark text-white px-8 py-4 rounded-sm text-sm uppercase tracking-widest transition-all duration-300 shadow-md hover:shadow-lg"
+              className="bg-[#dcc188] hover:bg-[#e8d5ae] text-[#2a1a12] px-8 py-4 rounded-sm text-sm uppercase tracking-widest text-center transition-colors duration-300"
             >
               Book Your Class
             </Link>
             <Link
-              href="/#services"
-              className="bg-transparent border border-primary text-primary hover:bg-primary/5 px-8 py-4 rounded-sm text-sm uppercase tracking-widest transition-all duration-300"
+              href="/#classes"
+              className="border border-[#efe7d8]/50 hover:border-[#efe7d8] text-[#efe7d8] px-8 py-4 rounded-sm text-sm uppercase tracking-widest text-center transition-colors duration-300"
             >
-              Explore Services
+              Explore Classes
             </Link>
           </motion.div>
         </motion.div>

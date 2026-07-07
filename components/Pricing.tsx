@@ -2,229 +2,223 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { Check } from "lucide-react";
+
+const EASE = [0.16, 1, 0.3, 1] as const;
+
+type Plan = {
+  duration: string;
+  sessions: number;
+  price: string;
+};
+
+type Program = {
+  title: string;
+  frequency: string;
+  plans: Plan[];
+  featured?: boolean;
+};
+
+const programs: Program[] = [
+  {
+    title: "Group Reformer",
+    frequency: "2 sessions a week",
+    plans: [
+      { duration: "1 Month", sessions: 8, price: "30,000" },
+      { duration: "3 Months", sessions: 24, price: "50,000" },
+      { duration: "6 Months", sessions: 48, price: "80,000" },
+      { duration: "1 Year", sessions: 96, price: "150,000" },
+    ],
+  },
+  {
+    title: "Group Reformer",
+    frequency: "3 sessions a week",
+    featured: true,
+    plans: [
+      { duration: "1 Month", sessions: 12, price: "40,000" },
+      { duration: "3 Months", sessions: 36, price: "100,000" },
+      { duration: "6 Months", sessions: 72, price: "180,000" },
+      { duration: "1 Year", sessions: 144, price: "300,000" },
+    ],
+  },
+  {
+    title: "Group Hot Pilates",
+    frequency: "3 sessions a week",
+    plans: [
+      { duration: "1 Month", sessions: 12, price: "20,000" },
+      { duration: "3 Months", sessions: 36, price: "50,000" },
+      { duration: "6 Months", sessions: 72, price: "80,000" },
+      { duration: "1 Year", sessions: 144, price: "120,000" },
+    ],
+  },
+];
+
+const included = [
+  "All equipment & studio access",
+  "Expert instruction",
+  "Safe & supportive environment",
+  "Progress tracking",
+  "Free water, sauna, ice bath & red light therapy",
+];
+
+const policies = [
+  "Sessions are non-refundable and non-transferable.",
+  "24-hour cancellation notice required.",
+  "Missed sessions cannot be rescheduled.",
+];
 
 export default function Pricing() {
-  const coreMemberships = [
-    {
-      title: "Standard Access",
-      subtitle: "Yoga + Hot Pilates",
-      prices: [
-        { duration: "Drop IN", price: "2,500", note: undefined },
-        { duration: "1 Month", price: "8,000", note: undefined },
-        { duration: "3 Months", price: "20,000", note: undefined },
-        { duration: "6 Months", price: "35,000", note: undefined },
-        { duration: "1 Year", price: "55,000", note: undefined },
-      ],
-      unlimited: true
-    },
-    {
-      title: "Premium Access",
-      subtitle: "Yoga + Mat Pilates + Hot Pilates + Reformer",
-      prices: [
-        { duration: "1 Month", price: "35,000", note: "one class per week for each service" },
-        { duration: "3 Months", price: "80,000", note: "4 class for each service" },
-        { duration: "6 Months", price: "130,000", note: "8 class for each service" },
-      ],
-      unlimited: false
-    }
-  ];
-
-  const classPackages = [
-    {
-      title: "Hot Pilates",
-      prices: [
-        { duration: "Drop-in", price: "2,000", note: undefined },
-        { duration: "1 Month", price: "6,000", note: "4 class" },
-        { duration: "3 Months", price: "10,000", note: "8 class" },
-        { duration: "6 Months", price: "15,000", note: "16 class" },
-        { duration: "1 Year", price: "20,000", note: "32 class" },
-      ]
-    },
-    {
-      title: "Reformer Pilates",
-      prices: [
-        { duration: "Drop-in", price: "4,500", note: undefined },
-        { duration: "1 Month", price: "15,000", note: "4 class" },
-        { duration: "3 Months", price: "35,000", note: "12 class" },
-        { duration: "6 Months", price: "50,000", note: "24 class" },
-        { duration: "1 Year", price: "80,000", note: undefined },
-      ]
-    },
-    {
-      title: "Mat Pilates",
-      prices: [
-        { duration: "Drop-in", price: "2,000", note: undefined },
-        { duration: "1 Month", price: "10,000", note: "8 class" },
-        { duration: "3 Months", price: "25,000", note: "24 class" },
-        { duration: "6 Months", price: "40,000", note: "48 class" },
-        { duration: "1 Year", price: "60,000", note: "96 class" },
-      ]
-    },
-    {
-      title: "Yoga",
-      prices: [
-        { duration: "Drop-in", price: "2,000", note: undefined },
-        { duration: "1 Month", price: "6,000", note: "4 class" },
-        { duration: "3 Months", price: "10,000", note: "8 class" },
-        { duration: "6 Months", price: "15,000", note: "16 class" },
-        { duration: "1 Year", price: "20,000", note: "32 class" },
-      ]
-    }
-  ];
-
-  const specialtyPrograms = [
-    {
-      title: "Pregnancy Yoga",
-      prices: [
-        { duration: "Drop-in", price: "2,500", note: undefined },
-        { duration: "1 Month", price: "8,000", note: undefined },
-        { duration: "3 Months", price: "20,000", note: undefined },
-        { duration: "6 Months", price: "30,000", note: undefined },
-      ]
-    },
-    {
-      title: "Kids / Beginner Ballet",
-      prices: [
-        { duration: "Drop-in", price: "1,500", note: undefined },
-        { duration: "1 Month", price: "3,500", note: undefined },
-        { duration: "3 Months", price: "9,500", note: undefined },
-        { duration: "6 Months", price: "17,000", note: undefined },
-        { duration: "1 Year", price: "32,000", note: undefined },
-      ]
-    },
-    {
-      title: "VIP / Private Training",
-      subtitle: "Free infused water, matcha",
-      prices: [
-        { duration: "1 Session", price: "10,000", note: undefined },
-        { duration: "4 Sessions", price: "30,000", note: undefined },
-      ]
-    }
-  ];
-
   return (
-    <section id="pricing" className="py-24 bg-secondary/20">
+    <section id="pricing" className="py-20 md:py-32 bg-background">
       <div className="container mx-auto px-6 md:px-12">
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <motion.h2 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="font-serif text-4xl md:text-5xl text-primary-dark mb-6"
-          >
-            Premium Studio Packages
-          </motion.h2>
-          <motion.div 
-            initial={{ opacity: 0, width: 0 }}
-            whileInView={{ opacity: 1, width: "64px" }}
-            viewport={{ once: true }}
-            className="h-px bg-primary mx-auto mb-6"
-          ></motion.div>
-          <motion.p 
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.2 }}
-            className="text-stone-600"
-          >
-            Choose the package that best fits your wellness journey. Pre-payment and full payment options available.
-          </motion.p>
-        </div>
+        <motion.div
+          initial={{ opacity: 0.2, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.8, ease: EASE }}
+          className="text-center max-w-2xl mx-auto mb-14 md:mb-20"
+        >
+          <h2 className="font-serif text-4xl md:text-5xl text-primary-dark mb-6">
+            Pilates packages
+          </h2>
+          <div className="w-16 h-px bg-brass mx-auto mb-6"></div>
+          <p className="text-stone-700 leading-relaxed">
+            Invest in your body. Embrace the journey. Thrive every day.
+            <br />
+            All prices in ETB.
+          </p>
+        </motion.div>
 
-        {/* Core Memberships */}
-        <div className="mb-16">
-          <h3 className="font-serif text-3xl text-center text-primary-dark mb-10">Core Memberships <span className="text-lg italic text-stone-500">(Unlimited Classes)</span></h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-            {coreMemberships.map((membership, idx) => (
-              <motion.div 
-                key={idx}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: idx * 0.2 }}
-                className={`bg-white p-8 rounded-sm shadow-sm border-t-4 flex flex-col h-full ${idx === 1 ? 'border-primary' : 'border-secondary'}`}
+        <div className="max-w-5xl mx-auto space-y-8 md:space-y-10">
+          {programs.map((program, index) => (
+            <motion.div
+              key={`${program.title}-${program.frequency}`}
+              initial={{ opacity: 0.15, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-60px" }}
+              transition={{ duration: 0.8, delay: index * 0.08, ease: EASE }}
+              className={`rounded-sm p-7 md:p-10 ${
+                program.featured
+                  ? "bg-primary-dark text-[#f5efe4]"
+                  : "bg-surface border border-secondary"
+              }`}
+            >
+              <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-2 mb-8">
+                <h3
+                  className={`font-serif text-3xl ${
+                    program.featured ? "text-[#faf6ee]" : "text-primary-dark"
+                  }`}
+                >
+                  {program.title}
+                </h3>
+                <p
+                  className={`text-sm uppercase tracking-widest ${
+                    program.featured ? "text-[#d3bd92]" : "text-brass"
+                  }`}
+                >
+                  {program.frequency}
+                </p>
+              </div>
+
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-8">
+                {program.plans.map((plan) => (
+                  <div key={plan.duration}>
+                    <p
+                      className={`text-sm mb-2 ${
+                        program.featured ? "text-[#d8c8b2]" : "text-stone-600"
+                      }`}
+                    >
+                      {plan.duration}
+                    </p>
+                    <p
+                      className={`font-serif text-3xl md:text-4xl leading-none mb-1.5 ${
+                        program.featured ? "text-[#faf6ee]" : "text-foreground"
+                      }`}
+                    >
+                      {plan.price}
+                    </p>
+                    <p
+                      className={`text-xs uppercase tracking-wider ${
+                        program.featured ? "text-[#d8c8b2]" : "text-stone-500"
+                      }`}
+                    >
+                      {plan.sessions} sessions
+                    </p>
+                  </div>
+                ))}
+              </div>
+
+              <div
+                className={`mt-9 pt-6 border-t flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 ${
+                  program.featured ? "border-[#f5efe4]/20" : "border-secondary"
+                }`}
               >
-                <h4 className="font-serif text-2xl text-primary-dark mb-2">{membership.title}</h4>
-                <p className="text-sm text-stone-500 mb-6 pb-6 border-b border-stone-100">{membership.subtitle}</p>
-                <ul className="space-y-4 mb-8 flex-grow">
-                  {membership.prices.map((price, pIdx) => (
-                    <li key={pIdx} className="flex justify-between items-center">
-                      <span className="text-stone-600 font-medium">{price.duration}</span>
-                      <div className="text-right">
-                        <span className="text-primary-dark font-serif text-lg">{price.price}</span>
-                        {price.note && <p className="text-xs text-stone-400">{price.note}</p>}
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-                <Link href="/register" className={`block text-center py-3 rounded-sm text-sm uppercase tracking-widest transition-colors mt-auto ${idx === 1 ? 'bg-primary text-white hover:bg-primary-dark' : 'bg-secondary/30 text-primary-dark hover:bg-secondary/50'}`}>
-                  Select Package
+                <p
+                  className={`text-sm ${
+                    program.featured ? "text-[#d8c8b2]" : "text-stone-600"
+                  }`}
+                >
+                  Includes water, sauna, ice bath &amp; red light therapy.
+                </p>
+                <Link
+                  href="/register"
+                  className={`inline-block text-center px-6 py-3 rounded-sm text-sm uppercase tracking-widest transition-colors duration-300 ${
+                    program.featured
+                      ? "bg-[#dcc188] hover:bg-[#e8d5ae] text-[#2a1a12]"
+                      : "border border-primary-dark text-primary-dark hover:bg-primary-dark hover:text-[#faf6ee]"
+                  }`}
+                >
+                  Get started
                 </Link>
-              </motion.div>
-            ))}
-          </div>
+              </div>
+            </motion.div>
+          ))}
         </div>
 
-        {/* Class Packages */}
-        <div className="mb-16">
-          <h3 className="font-serif text-3xl text-center text-primary-dark mb-10">Class Packages</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {classPackages.map((pkg, idx) => (
-              <motion.div 
-                key={idx}
-                initial={{ opacity: 0, scale: 0.95 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: idx * 0.1 }}
-                className="bg-white p-6 rounded-sm shadow-sm"
-              >
-                <h4 className="font-serif text-xl text-primary-dark mb-4 pb-4 border-b border-stone-100">{pkg.title}</h4>
-                <ul className="space-y-3">
-                  {pkg.prices.map((price, pIdx) => (
-                    <li key={pIdx} className="flex flex-col">
-                      <div className="flex justify-between items-center">
-                        <span className="text-stone-600 text-sm">{price.duration}</span>
-                        <span className="text-primary-dark font-serif">{price.price}</span>
-                      </div>
-                      {price.note && <span className="text-xs text-stone-400">{price.note}</span>}
-                    </li>
-                  ))}
-                </ul>
-              </motion.div>
-            ))}
+        <motion.div
+          initial={{ opacity: 0.2, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-60px" }}
+          transition={{ duration: 0.8, ease: EASE }}
+          className="max-w-5xl mx-auto mt-14 md:mt-20 grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16"
+        >
+          <div>
+            <h3 className="font-serif text-2xl text-primary-dark mb-6">
+              What&apos;s included
+            </h3>
+            <ul className="space-y-3.5">
+              {included.map((item) => (
+                <li key={item} className="flex items-start gap-3">
+                  <Check
+                    aria-hidden
+                    size={18}
+                    strokeWidth={2}
+                    className="text-olive mt-0.5 shrink-0"
+                  />
+                  <span className="text-stone-700 leading-relaxed">{item}</span>
+                </li>
+              ))}
+            </ul>
           </div>
-        </div>
-
-        {/* Specialty Programs */}
-        <div>
-          <h3 className="font-serif text-3xl text-center text-primary-dark mb-10">Specialty Programs</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-            {specialtyPrograms.map((program, idx) => (
-              <motion.div 
-                key={idx}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: idx * 0.1 }}
-                className="bg-primary-dark text-white p-6 rounded-sm shadow-sm"
-              >
-                <h4 className="font-serif text-xl mb-2">{program.title}</h4>
-                {program.subtitle && <p className="text-sm text-primary-light mb-4 pb-4 border-b border-primary/30">{program.subtitle}</p>}
-                {!program.subtitle && <div className="mb-4 pb-4 border-b border-primary/30"></div>}
-                
-                <ul className="space-y-3">
-                  {program.prices.map((price, pIdx) => (
-                    <li key={pIdx} className="flex justify-between items-center">
-                      <span className="text-primary-light text-sm">{price.duration}</span>
-                      <span className="font-serif">{price.price}</span>
-                    </li>
-                  ))}
-                </ul>
-              </motion.div>
-            ))}
+          <div>
+            <h3 className="font-serif text-2xl text-primary-dark mb-6">
+              Studio policies
+            </h3>
+            <ul className="space-y-3.5">
+              {policies.map((item) => (
+                <li
+                  key={item}
+                  className="text-stone-700 leading-relaxed border-b border-secondary pb-3.5"
+                >
+                  {item}
+                </li>
+              ))}
+            </ul>
+            <p className="font-serif italic text-xl text-brass mt-8">
+              Consistency today, strength forever.
+            </p>
           </div>
-        </div>
-
+        </motion.div>
       </div>
     </section>
   );

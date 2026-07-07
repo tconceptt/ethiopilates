@@ -3,16 +3,51 @@
 @theme inline {
   --font-sans: var(--font-lato), sans-serif;
   --font-serif: var(--font-cormorant), serif;
-  
-  --color-primary: #8C7A6B;
-  --color-primary-light: #A89B8F;
-  --color-primary-dark: #6B5C4F;
-  --color-secondary: #D9D2C5;
-  --color-background: #FAF9F6;
-  --color-foreground: #2C2A28;
+
+  /* Palette drawn from the studio's own materials:
+     cream plaster, brass wall lettering, oxblood lockers,
+     olive walls, warm oak, black reformers. */
+  --color-primary: #8c7a6b;
+  --color-primary-light: #a89b8f;
+  --color-primary-dark: #4a3f35;
+  --color-secondary: #e4dccd;
+  --color-background: #f7f3ec;
+  --color-surface: #fffdf9;
+  --color-foreground: #292420;
+  --color-brass: #96742f;
+  --color-brass-light: #c9a55e;
+  --color-oxblood: #6e352a;
+  --color-oxblood-deep: #542720;
+  --color-olive: #6c6842;
 }
 
 body {
   background-color: var(--color-background);
   color: var(--color-foreground);
+}
+
+::selection {
+  background-color: #c9a55e;
+  color: #2a1a12;
+}
+
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-brass);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }
