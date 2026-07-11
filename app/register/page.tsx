@@ -3,10 +3,11 @@
 import { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, Check, ChevronLeft, ChevronRight, Copy, Clock, ExternalLink } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, ChevronLeft, ChevronRight, Copy, Clock, ExternalLink, Users } from "lucide-react";
 import Image from "next/image";
-import { useMutation } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
+import { CLASSES, toDateKey, type ClassKey, type DayKey } from "../../lib/classes";
 
 const PAYMENT_DETAILS = {
   bankName: "Tele Birr",
@@ -18,15 +19,6 @@ const PAYMENT_DETAILS = {
 
 const ADVANCE_PAYMENT = 1500;
 
-type ClassKey =
-  | "group-reformer"
-  | "private-reformer"
-  | "mat-pilates"
-  | "hot-pilates"
-  | "yoga"
-  | "pregnancy-yoga";
-
-type DayKey = "Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat";
 const JS_DAY_TO_KEY: Record<number, DayKey | null> = {
   0: null,
   1: "Mon",
@@ -71,74 +63,6 @@ function relativeLabel(date: Date, today: Date): string | null {
   return null;
 }
 
-type ClassInfo = {
-  label: string;
-  blurb: string;
-  schedule: Partial<Record<DayKey, string[]>>;
-};
-
-const CLASSES: Record<ClassKey, ClassInfo> = {
-  "group-reformer": {
-    label: "Group Reformer",
-    blurb: "Equipment-based reformer session in a small group setting.",
-    schedule: {
-      Mon: ["8:00–9:00 AM", "9:00–10:00 AM", "4:00–5:00 PM", "5:00–6:00 PM", "6:00–7:00 PM"],
-      Tue: ["8:00–9:00 AM", "9:00–10:00 AM", "4:00–5:00 PM", "5:00–6:00 PM", "6:00–7:00 PM"],
-      Wed: ["8:00–9:00 AM", "9:00–10:00 AM", "4:00–5:00 PM", "5:00–6:00 PM", "6:00–7:00 PM"],
-      Thu: ["8:00–9:00 AM", "9:00–10:00 AM", "4:00–5:00 PM", "5:00–6:00 PM", "6:00–7:00 PM"],
-      Fri: ["8:00–9:00 AM", "9:00–10:00 AM", "4:00–5:00 PM", "5:00–6:00 PM", "6:00–7:00 PM"],
-      Sat: ["8:00–9:00 AM", "10:00–11:00 AM", "2:00–3:00 PM"],
-    },
-  },
-  "private-reformer": {
-    label: "Private Reformer",
-    blurb: "One-on-one reformer session. Flexible windows available.",
-    schedule: {
-      Mon: ["2:00–9:00 PM (open slots)", "8:00–9:00 PM"],
-      Tue: ["2:00–9:00 PM (open slots)", "8:00–9:00 PM"],
-      Wed: ["2:00–9:00 PM (open slots)", "8:00–9:00 PM"],
-      Thu: ["2:00–9:00 PM (open slots)", "8:00–9:00 PM"],
-      Fri: ["2:00–9:00 PM (open slots)", "8:00–9:00 PM"],
-    },
-  },
-  "mat-pilates": {
-    label: "Mat Pilates",
-    blurb: "Mat-based Pilates focused on core strength and control.",
-    schedule: {
-      Mon: ["9:00–10:00 AM", "5:00–6:00 PM"],
-      Thu: ["9:00–10:00 AM", "5:00–6:00 PM"],
-    },
-  },
-  "hot-pilates": {
-    label: "Hot Pilates",
-    blurb: "Dynamic Pilates in a heated room for added intensity.",
-    schedule: {
-      Mon: ["8:00–9:00 AM", "9:00–10:00 AM", "4:00–5:00 PM", "5:00–6:00 PM", "6:00–7:00 PM"],
-      Tue: ["8:00–9:00 AM", "9:00–10:00 AM", "4:00–5:00 PM", "5:00–6:00 PM", "6:00–7:00 PM"],
-      Wed: ["8:00–9:00 AM", "9:00–10:00 AM", "4:00–5:00 PM", "5:00–6:00 PM", "6:00–7:00 PM"],
-      Thu: ["8:00–9:00 AM", "9:00–10:00 AM", "4:00–5:00 PM", "5:00–6:00 PM", "6:00–7:00 PM"],
-      Fri: ["8:00–9:00 AM", "9:00–10:00 AM", "4:00–5:00 PM", "5:00–6:00 PM", "6:00–7:00 PM"],
-      Sat: ["8:00–9:00 AM", "9:00–10:00 AM", "12:00–1:00 PM"],
-    },
-  },
-  yoga: {
-    label: "Heran's Yoga",
-    blurb: "Calming, restorative flows to stretch and reset.",
-    schedule: {
-      Mon: ["10:00–11:30 AM"],
-      Thu: ["10:00–11:30 AM"],
-    },
-  },
-  "pregnancy-yoga": {
-    label: "Pregnancy Yoga",
-    blurb: "Gentle, supportive sessions tailored for mothers-to-be.",
-    schedule: {
-      Mon: ["6:00–7:00 PM"],
-      Thu: ["6:00–7:00 PM"],
-    },
-  },
-};
-
 function slotsForDate(classKey: ClassKey, date: Date): string[] {
   const k = JS_DAY_TO_KEY[date.getDay()];
   if (!k) return [];
@@ -180,10 +104,18 @@ export default function Register() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [isMember, setIsMember] = useState(false);
 
   const today = useMemo(() => startOfToday(), []);
 
   const createRegistration = useMutation(api.registrations.create);
+
+  const availability = useQuery(
+    api.classes.availability,
+    selectedClass && displayedDate
+      ? { classKey: selectedClass, classDate: toDateKey(displayedDate) }
+      : "skip",
+  );
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -249,17 +181,27 @@ export default function Register() {
       await createRegistration({
         firstName: formData.firstName,
         lastName: formData.lastName,
-        email: formData.email || undefined,
-        phone: formData.phone,
+        email: !isMember && formData.email ? formData.email : undefined,
+        phone: isMember ? undefined : formData.phone,
         package: cls.label,
-        price: ADVANCE_PAYMENT,
+        price: isMember ? 0 : ADVANCE_PAYMENT,
         schedule: label,
         experienceLevel: "beginner",
+        isMember,
+        classKey: selectedClass,
+        classDate: toDateKey(selectedDate),
+        classSlot: selectedSlot,
       });
       setIsComplete(true);
     } catch (error) {
       console.error("Failed to submit registration:", error);
-      alert("Something went wrong. Please try again.");
+      if (error instanceof Error && error.message.includes("CLASS_FULL")) {
+        alert("Sorry, this class just filled up. Please pick another time slot.");
+        setSelectedSlot(null);
+        setStep(2);
+      } else {
+        alert("Something went wrong. Please try again.");
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -337,27 +279,49 @@ export default function Register() {
                     exit={{ opacity: 0, y: -10 }}
                     className="py-6 sm:py-8"
                   >
-                    <div className="text-center mb-6">
-                      <div className="w-14 h-14 sm:w-16 sm:h-16 mx-auto mb-4 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center">
-                        <Clock size={28} />
+                    {isMember ? (
+                      <div className="text-center mb-6">
+                        <div className="w-14 h-14 sm:w-16 sm:h-16 mx-auto mb-4 rounded-full bg-green-100 text-green-600 flex items-center justify-center">
+                          <Check size={28} />
+                        </div>
+                        <div className="inline-block text-[10px] sm:text-xs uppercase tracking-widest bg-green-100 text-green-800 px-3 py-1 rounded-full mb-3">
+                          Booking confirmed
+                        </div>
+                        <h2 className="font-serif text-2xl md:text-3xl text-primary-dark mb-2">
+                          You&apos;re booked!
+                        </h2>
+                        <p className="text-sm sm:text-base text-stone-600 max-w-md mx-auto">
+                          Your spot for{" "}
+                          <span className="font-medium text-primary-dark">{selectedClassInfo?.label}</span> on{" "}
+                          <span className="font-medium text-primary-dark">{scheduleLabel}</span> is confirmed
+                          under your membership. See you in the studio!
+                        </p>
                       </div>
-                      <div className="inline-block text-[10px] sm:text-xs uppercase tracking-widest bg-amber-100 text-amber-800 px-3 py-1 rounded-full mb-3">
-                        Awaiting payment
-                      </div>
-                      <h2 className="font-serif text-2xl md:text-3xl text-primary-dark mb-2">
-                        Spot reserved — one step left
-                      </h2>
-                      <p className="text-sm sm:text-base text-stone-600 max-w-md mx-auto">
-                        We&apos;ve held your spot for{" "}
-                        <span className="font-medium text-primary-dark">{selectedClassInfo?.label}</span> on{" "}
-                        <span className="font-medium text-primary-dark">{scheduleLabel}</span>. Send the{" "}
-                        <span className="font-medium text-primary-dark">{ADVANCE_PAYMENT.toLocaleString()} ETB</span>{" "}
-                        advance payment and the screenshot on WhatsApp to confirm.
-                      </p>
-                    </div>
-                    <div className="max-w-md mx-auto">
-                      <PaymentBox onCopy={handleCopy} copied={copied} />
-                    </div>
+                    ) : (
+                      <>
+                        <div className="text-center mb-6">
+                          <div className="w-14 h-14 sm:w-16 sm:h-16 mx-auto mb-4 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center">
+                            <Clock size={28} />
+                          </div>
+                          <div className="inline-block text-[10px] sm:text-xs uppercase tracking-widest bg-amber-100 text-amber-800 px-3 py-1 rounded-full mb-3">
+                            Awaiting payment
+                          </div>
+                          <h2 className="font-serif text-2xl md:text-3xl text-primary-dark mb-2">
+                            Spot reserved — one step left
+                          </h2>
+                          <p className="text-sm sm:text-base text-stone-600 max-w-md mx-auto">
+                            We&apos;ve held your spot for{" "}
+                            <span className="font-medium text-primary-dark">{selectedClassInfo?.label}</span> on{" "}
+                            <span className="font-medium text-primary-dark">{scheduleLabel}</span>. Send the{" "}
+                            <span className="font-medium text-primary-dark">{ADVANCE_PAYMENT.toLocaleString()} ETB</span>{" "}
+                            advance payment and the screenshot on WhatsApp to confirm.
+                          </p>
+                        </div>
+                        <div className="max-w-md mx-auto">
+                          <PaymentBox onCopy={handleCopy} copied={copied} />
+                        </div>
+                      </>
+                    )}
                     <div className="text-center mt-8">
                       <Link
                         href="/"
@@ -470,19 +434,48 @@ export default function Register() {
                                   selectedDate &&
                                   isSameDay(selectedDate, displayedDate) &&
                                   selectedSlot === slot;
+                                const booked =
+                                  availability?.slots.find((s) => s.slot === slot)?.booked ?? 0;
+                                const remaining = availability
+                                  ? Math.max(0, availability.capacity - booked)
+                                  : null;
+                                const isFull = remaining !== null && remaining <= 0;
                                 return (
                                   <button
                                     type="button"
                                     key={slot}
                                     onClick={() => handlePickSlot(displayedDate, slot)}
-                                    className={`inline-flex items-center justify-center gap-1.5 text-xs sm:text-sm px-2 sm:px-3 py-2.5 rounded-sm border transition-colors ${
-                                      isActive
-                                        ? "bg-primary border-primary text-white"
-                                        : "bg-white border-stone-200 text-stone-700 hover:border-primary hover:text-primary"
+                                    disabled={isFull}
+                                    className={`flex flex-col items-center justify-center gap-1 text-xs sm:text-sm px-2 sm:px-3 py-2.5 rounded-sm border transition-colors ${
+                                      isFull
+                                        ? "bg-stone-50 border-stone-200 text-stone-400 cursor-not-allowed"
+                                        : isActive
+                                          ? "bg-primary border-primary text-white"
+                                          : "bg-white border-stone-200 text-stone-700 hover:border-primary hover:text-primary"
                                     }`}
                                   >
-                                    <Clock size={12} />
-                                    <span className="truncate">{slot}</span>
+                                    <span className="inline-flex items-center gap-1.5">
+                                      <Clock size={12} />
+                                      <span className="truncate">{slot}</span>
+                                    </span>
+                                    {remaining !== null && (
+                                      <span
+                                        className={`inline-flex items-center gap-1 text-[10px] uppercase tracking-wider ${
+                                          isFull
+                                            ? "text-red-400"
+                                            : isActive
+                                              ? "text-white/80"
+                                              : remaining <= 2
+                                                ? "text-amber-600"
+                                                : "text-stone-400"
+                                        }`}
+                                      >
+                                        <Users size={10} />
+                                        {isFull
+                                          ? "Full"
+                                          : `${remaining} spot${remaining === 1 ? "" : "s"} left`}
+                                      </span>
+                                    )}
                                   </button>
                                 );
                               })}
@@ -552,6 +545,46 @@ export default function Register() {
                     <form onSubmit={handleSubmit} className="space-y-8">
                       <section>
                         <h3 className="font-serif text-lg text-primary-dark mb-4 border-b border-stone-100 pb-2">
+                          Booking as
+                        </h3>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          <button
+                            type="button"
+                            onClick={() => setIsMember(false)}
+                            className={`text-left border rounded-sm p-4 transition-all ${
+                              !isMember
+                                ? "border-primary bg-primary/5"
+                                : "border-stone-200 hover:border-primary/50"
+                            }`}
+                          >
+                            <div className="font-medium text-primary-dark text-sm sm:text-base mb-0.5">
+                              Guest
+                            </div>
+                            <p className="text-xs text-stone-500">
+                              First time or drop-in — advance payment required to confirm.
+                            </p>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setIsMember(true)}
+                            className={`text-left border rounded-sm p-4 transition-all ${
+                              isMember
+                                ? "border-primary bg-primary/5"
+                                : "border-stone-200 hover:border-primary/50"
+                            }`}
+                          >
+                            <div className="font-medium text-primary-dark text-sm sm:text-base mb-0.5">
+                              Member
+                            </div>
+                            <p className="text-xs text-stone-500">
+                              I have an active membership — no payment needed, just my name.
+                            </p>
+                          </button>
+                        </div>
+                      </section>
+
+                      <section>
+                        <h3 className="font-serif text-lg text-primary-dark mb-4 border-b border-stone-100 pb-2">
                           Personal Information
                         </h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -585,64 +618,87 @@ export default function Register() {
                               placeholder="Enter your last name"
                             />
                           </div>
-                          <div>
-                            <label htmlFor="phone" className="block text-sm font-medium text-stone-700 mb-2">
-                              Phone Number *
-                            </label>
-                            <input
-                              type="tel"
-                              id="phone"
-                              name="phone"
-                              required
-                              value={formData.phone}
-                              onChange={handleChange}
-                              className="w-full px-4 py-3 rounded-sm border border-stone-300 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
-                              placeholder="+251 9X XXX XXXX"
-                            />
-                          </div>
-                          <div>
-                            <label htmlFor="email" className="block text-sm font-medium text-stone-700 mb-2">
-                              Email (Optional)
-                            </label>
-                            <input
-                              type="email"
-                              id="email"
-                              name="email"
-                              value={formData.email}
-                              onChange={handleChange}
-                              className="w-full px-4 py-3 rounded-sm border border-stone-300 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
-                              placeholder="your@email.com"
-                            />
-                          </div>
+                          {!isMember && (
+                            <>
+                              <div>
+                                <label htmlFor="phone" className="block text-sm font-medium text-stone-700 mb-2">
+                                  Phone Number *
+                                </label>
+                                <input
+                                  type="tel"
+                                  id="phone"
+                                  name="phone"
+                                  required
+                                  value={formData.phone}
+                                  onChange={handleChange}
+                                  className="w-full px-4 py-3 rounded-sm border border-stone-300 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
+                                  placeholder="+251 9X XXX XXXX"
+                                />
+                              </div>
+                              <div>
+                                <label htmlFor="email" className="block text-sm font-medium text-stone-700 mb-2">
+                                  Email (Optional)
+                                </label>
+                                <input
+                                  type="email"
+                                  id="email"
+                                  name="email"
+                                  value={formData.email}
+                                  onChange={handleChange}
+                                  className="w-full px-4 py-3 rounded-sm border border-stone-300 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
+                                  placeholder="your@email.com"
+                                />
+                              </div>
+                            </>
+                          )}
                         </div>
                       </section>
 
-                      <div className="bg-amber-50 border-l-4 border-amber-500 rounded-sm px-4 py-3.5 flex items-start gap-3">
-                        <div className="shrink-0 w-7 h-7 rounded-full bg-amber-500 text-white flex items-center justify-center text-xs font-bold">
-                          !
+                      {isMember ? (
+                        <div className="bg-green-50 border-l-4 border-green-500 rounded-sm px-4 py-3.5 flex items-start gap-3">
+                          <div className="shrink-0 w-7 h-7 rounded-full bg-green-500 text-white flex items-center justify-center">
+                            <Check size={14} />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="font-medium text-green-900 text-sm sm:text-base">
+                              No payment needed
+                            </p>
+                            <p className="text-xs sm:text-sm text-green-800/80 mt-0.5">
+                              Your class is covered by your membership. Just submit your name and
+                              your spot is booked.
+                            </p>
+                          </div>
                         </div>
-                        <div className="min-w-0">
-                          <p className="font-medium text-amber-900 text-sm sm:text-base">
-                            Advance payment of {ADVANCE_PAYMENT.toLocaleString()} ETB required
-                          </p>
-                          <p className="text-xs sm:text-sm text-amber-800/80 mt-0.5">
-                            You&apos;ll receive payment instructions after submitting. Your booking is confirmed once
-                            we receive your screenshot on WhatsApp.
-                          </p>
+                      ) : (
+                        <div className="bg-amber-50 border-l-4 border-amber-500 rounded-sm px-4 py-3.5 flex items-start gap-3">
+                          <div className="shrink-0 w-7 h-7 rounded-full bg-amber-500 text-white flex items-center justify-center text-xs font-bold">
+                            !
+                          </div>
+                          <div className="min-w-0">
+                            <p className="font-medium text-amber-900 text-sm sm:text-base">
+                              Advance payment of {ADVANCE_PAYMENT.toLocaleString()} ETB required
+                            </p>
+                            <p className="text-xs sm:text-sm text-amber-800/80 mt-0.5">
+                              You&apos;ll receive payment instructions after submitting. Your booking is confirmed once
+                              we receive your screenshot on WhatsApp.
+                            </p>
+                          </div>
                         </div>
-                      </div>
+                      )}
 
                       <button
                         type="submit"
                         disabled={isSubmitting}
                         className="w-full bg-primary hover:bg-primary-dark text-white py-4 rounded-sm text-sm uppercase tracking-widest transition-colors font-medium shadow-sm hover:shadow-md disabled:opacity-70 disabled:cursor-not-allowed"
                       >
-                        {isSubmitting ? "Submitting..." : "Reserve My Spot"}
+                        {isSubmitting ? "Submitting..." : isMember ? "Book My Spot" : "Reserve My Spot"}
                       </button>
 
-                      <p className="text-center text-xs text-stone-500">
-                        We&apos;ll show you the Telebirr account and WhatsApp number on the next screen.
-                      </p>
+                      {!isMember && (
+                        <p className="text-center text-xs text-stone-500">
+                          We&apos;ll show you the Telebirr account and WhatsApp number on the next screen.
+                        </p>
+                      )}
                     </form>
                   </motion.div>
                 )}

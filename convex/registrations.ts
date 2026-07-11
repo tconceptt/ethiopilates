@@ -13,17 +13,45 @@ export const create = mutation({
     firstName: v.string(),
     lastName: v.string(),
     email: v.optional(v.string()),
-    phone: v.string(),
+    phone: v.optional(v.string()),
     package: v.string(),
     price: v.number(),
     schedule: v.optional(v.string()),
     experienceLevel: v.optional(v.string()),
     goals: v.optional(v.string()),
+    isMember: v.optional(v.boolean()),
+    classKey: v.optional(v.string()),
+    classDate: v.optional(v.string()),
+    classSlot: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
+    // Enforce capacity when the class has a limit configured. Mutations are
+    // transactions, so concurrent bookings can't oversell the slot.
+    if (args.classKey && args.classDate && args.classSlot) {
+      const setting = await ctx.db
+        .query("classSettings")
+        .withIndex("by_classKey", (q) => q.eq("classKey", args.classKey!))
+        .unique();
+      if (setting?.capacity !== undefined) {
+        const existing = await ctx.db
+          .query("registrations")
+          .withIndex("by_classKey_and_classDate_and_classSlot", (q) =>
+            q
+              .eq("classKey", args.classKey)
+              .eq("classDate", args.classDate)
+              .eq("classSlot", args.classSlot),
+          )
+          .take(500);
+        const active = existing.filter((r) => r.status !== "cancelled").length;
+        if (active >= setting.capacity) {
+          throw new Error("CLASS_FULL");
+        }
+      }
+    }
+
     const registrationId = await ctx.db.insert("registrations", {
       ...args,
-      status: "pending",
+      status: args.isMember ? "confirmed" : "pending",
       createdAt: Date.now(),
     });
     return registrationId;

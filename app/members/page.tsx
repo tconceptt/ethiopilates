@@ -3,10 +3,11 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { ArrowLeft, Check, X, Clock } from "lucide-react";
+import { ArrowLeft, Check, X, Clock, Users } from "lucide-react";
 import Image from "next/image";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
+import { CLASSES, CLASS_KEYS, type ClassKey } from "../../lib/classes";
 
 export default function Members() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -185,6 +186,8 @@ export default function Members() {
             </div>
           </div>
 
+          <ClassCapacitySettings />
+
           <div className="bg-white rounded-sm shadow-md overflow-hidden">
             <div className="p-6 md:p-8 border-b border-stone-100 bg-stone-50/50">
               <h1 className="font-serif text-2xl md:text-3xl text-primary-dark mb-1">Recent Registrations</h1>
@@ -221,8 +224,15 @@ export default function Members() {
                               {new Date(reg.createdAt).toLocaleDateString()}
                             </td>
                             <td className="py-4 px-6 align-top">
-                              <div className="font-medium text-stone-800">{reg.firstName} {reg.lastName}</div>
-                              <div className="text-sm text-stone-600 mt-1">{reg.phone}</div>
+                              <div className="font-medium text-stone-800 flex items-center gap-2">
+                                {reg.firstName} {reg.lastName}
+                                {reg.isMember && (
+                                  <span className="inline-flex items-center gap-1 text-blue-700 bg-blue-50 px-2 py-0.5 rounded-md text-[10px] font-semibold border border-blue-200 uppercase tracking-wider">
+                                    <Users size={10} /> Member
+                                  </span>
+                                )}
+                              </div>
+                              {reg.phone && <div className="text-sm text-stone-600 mt-1">{reg.phone}</div>}
                               {reg.email && <div className="text-xs text-stone-500">{reg.email}</div>}
                             </td>
                             <td className="py-4 px-6 align-top">
@@ -239,9 +249,14 @@ export default function Members() {
                               )}
                             </td>
                             <td className="py-4 px-6 align-top font-medium text-stone-800">
-                              {(reg.price ?? 0) > 0 ? `${(reg.price ?? 0).toLocaleString()} ETB` : 'N/A'}
+                              {reg.isMember ? 'Membership' : (reg.price ?? 0) > 0 ? `${(reg.price ?? 0).toLocaleString()} ETB` : 'N/A'}
                             </td>
                             <td className="py-4 px-6 align-top">
+                              {reg.status === "confirmed" && (
+                                <span className="inline-flex items-center gap-1 text-green-700 bg-green-50 px-2 py-1 rounded-md text-xs font-semibold border border-green-200">
+                                  <Check size={12} /> Confirmed
+                                </span>
+                              )}
                               {reg.status === "paid" && (
                                 <span className="inline-flex items-center gap-1 text-green-700 bg-green-50 px-2 py-1 rounded-md text-xs font-semibold border border-green-200">
                                   <Check size={12} /> Paid
@@ -276,17 +291,17 @@ export default function Members() {
                                     </button>
                                   </>
                                 )}
-                                {reg.status === "paid" && (
-                                  <button 
+                                {(reg.status === "paid" || reg.status === "confirmed") && (
+                                  <button
                                     onClick={() => handleUpdateStatus(reg._id, "cancelled")}
                                     className="text-xs border border-stone-200 text-stone-500 hover:bg-stone-50 px-3 py-1.5 rounded transition-colors w-full max-w-[120px]"
                                   >
-                                    Revoke
+                                    {reg.status === "confirmed" ? "Cancel" : "Revoke"}
                                   </button>
                                 )}
                                 {reg.status === "cancelled" && (
-                                  <button 
-                                    onClick={() => handleUpdateStatus(reg._id, "pending")}
+                                  <button
+                                    onClick={() => handleUpdateStatus(reg._id, reg.isMember ? "confirmed" : "pending")}
                                     className="text-xs border border-stone-200 text-stone-500 hover:bg-stone-50 px-3 py-1.5 rounded transition-colors w-full max-w-[120px]"
                                   >
                                     Restore
@@ -306,10 +321,22 @@ export default function Members() {
                       <div key={reg._id} className={`p-4 sm:p-6 ${reg.status === 'cancelled' ? 'bg-stone-100/50' : 'bg-white'}`}>
                         <div className="flex justify-between items-start mb-3">
                           <div>
-                            <h3 className="font-bold text-stone-800">{reg.firstName} {reg.lastName}</h3>
+                            <h3 className="font-bold text-stone-800 flex items-center gap-2">
+                              {reg.firstName} {reg.lastName}
+                              {reg.isMember && (
+                                <span className="inline-flex items-center gap-1 text-blue-700 bg-blue-50 px-2 py-0.5 rounded-md text-[10px] font-semibold border border-blue-200 uppercase tracking-wider">
+                                  <Users size={10} /> Member
+                                </span>
+                              )}
+                            </h3>
                             <p className="text-sm text-stone-500">{new Date(reg.createdAt).toLocaleDateString()}</p>
                           </div>
                           <div>
+                            {reg.status === "confirmed" && (
+                              <span className="inline-flex items-center gap-1 text-green-700 bg-green-50 px-2.5 py-1 rounded-md text-xs font-semibold border border-green-200">
+                                <Check size={12} /> Confirmed
+                              </span>
+                            )}
                             {reg.status === "paid" && (
                               <span className="inline-flex items-center gap-1 text-green-700 bg-green-50 px-2.5 py-1 rounded-md text-xs font-semibold border border-green-200">
                                 <Check size={12} /> Paid
@@ -331,12 +358,12 @@ export default function Members() {
                         <div className="grid grid-cols-2 gap-4 mb-4 text-sm">
                           <div>
                             <p className="text-stone-500 text-xs uppercase tracking-wider mb-1">Contact</p>
-                            <p className="font-medium text-stone-700">{reg.phone}</p>
+                            <p className="font-medium text-stone-700">{reg.phone || "—"}</p>
                             {reg.email && <p className="text-stone-500 truncate">{reg.email}</p>}
                           </div>
                           <div>
                             <p className="text-stone-500 text-xs uppercase tracking-wider mb-1">Amount</p>
-                            <p className="font-medium text-stone-800">{(reg.price ?? 0) > 0 ? `${(reg.price ?? 0).toLocaleString()} ETB` : 'N/A'}</p>
+                            <p className="font-medium text-stone-800">{reg.isMember ? 'Membership' : (reg.price ?? 0) > 0 ? `${(reg.price ?? 0).toLocaleString()} ETB` : 'N/A'}</p>
                           </div>
                         </div>
 
@@ -367,20 +394,20 @@ export default function Members() {
                               </button>
                             </>
                           )}
-                          {reg.status === "paid" && (
-                            <button 
+                          {(reg.status === "paid" || reg.status === "confirmed") && (
+                            <button
                               onClick={() => handleUpdateStatus(reg._id, "cancelled")}
                               className="w-full text-sm border border-stone-200 text-stone-500 hover:bg-stone-50 px-4 py-2 rounded transition-colors text-center"
                             >
-                              Revoke Payment
+                              {reg.status === "confirmed" ? "Cancel Booking" : "Revoke Payment"}
                             </button>
                           )}
                           {reg.status === "cancelled" && (
-                            <button 
-                              onClick={() => handleUpdateStatus(reg._id, "pending")}
+                            <button
+                              onClick={() => handleUpdateStatus(reg._id, reg.isMember ? "confirmed" : "pending")}
                               className="w-full text-sm border border-stone-200 text-stone-500 hover:bg-stone-50 px-4 py-2 rounded transition-colors text-center"
                             >
-                              Restore to Pending
+                              Restore
                             </button>
                           )}
                         </div>
@@ -393,6 +420,111 @@ export default function Members() {
           </div>
         </div>
       </main>
+    </div>
+  );
+}
+
+function ClassCapacitySettings() {
+  const settings = useQuery(api.classes.getSettings);
+  const setCapacity = useMutation(api.classes.setCapacity);
+  const [drafts, setDrafts] = useState<Partial<Record<ClassKey, string>>>({});
+  const [savingKey, setSavingKey] = useState<ClassKey | null>(null);
+
+  const savedCapacity = (key: ClassKey): number | null => {
+    const setting = settings?.find((s) => s.classKey === key);
+    return setting?.capacity ?? null;
+  };
+
+  const draftValue = (key: ClassKey): string => {
+    const draft = drafts[key];
+    if (draft !== undefined) return draft;
+    const saved = savedCapacity(key);
+    return saved === null ? "" : String(saved);
+  };
+
+  const isDirty = (key: ClassKey): boolean => {
+    const draft = drafts[key];
+    if (draft === undefined) return false;
+    const saved = savedCapacity(key);
+    return draft !== (saved === null ? "" : String(saved));
+  };
+
+  const handleSave = async (key: ClassKey) => {
+    const raw = draftValue(key).trim();
+    const parsed = raw === "" ? null : Number(raw);
+    if (parsed !== null && (!Number.isFinite(parsed) || parsed < 1)) {
+      alert("Capacity must be a number of 1 or more, or empty for no limit.");
+      return;
+    }
+    setSavingKey(key);
+    try {
+      await setCapacity({ classKey: key, capacity: parsed });
+      setDrafts((prev) => {
+        const next = { ...prev };
+        delete next[key];
+        return next;
+      });
+    } catch (err) {
+      console.error("Failed to save capacity:", err);
+      alert("Failed to save capacity.");
+    } finally {
+      setSavingKey(null);
+    }
+  };
+
+  return (
+    <div className="bg-white rounded-sm shadow-md overflow-hidden mb-8">
+      <div className="p-6 md:p-8 border-b border-stone-100 bg-stone-50/50">
+        <h2 className="font-serif text-2xl text-primary-dark mb-1">Class Capacity</h2>
+        <p className="text-sm text-stone-500">
+          Set spots per time slot for each class. Leave empty for no limit — capacity is
+          only shown to customers when set.
+        </p>
+      </div>
+      {settings === undefined ? (
+        <div className="text-center py-10 text-stone-500 flex flex-col items-center gap-3">
+          <div className="w-6 h-6 border-4 border-stone-200 border-t-primary rounded-full animate-spin"></div>
+          <p className="text-sm">Loading settings...</p>
+        </div>
+      ) : (
+        <div className="divide-y divide-stone-100">
+          {CLASS_KEYS.map((key) => {
+            const saved = savedCapacity(key);
+            return (
+              <div
+                key={key}
+                className="flex flex-wrap items-center justify-between gap-3 px-6 md:px-8 py-4"
+              >
+                <div className="min-w-0">
+                  <div className="font-medium text-stone-800">{CLASSES[key].label}</div>
+                  <div className="text-xs text-stone-500 mt-0.5">
+                    {saved === null ? "No limit set" : `${saved} spots per slot`}
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 shrink-0">
+                  <input
+                    type="number"
+                    min={1}
+                    value={draftValue(key)}
+                    onChange={(e) =>
+                      setDrafts((prev) => ({ ...prev, [key]: e.target.value }))
+                    }
+                    placeholder="No limit"
+                    className="w-24 px-3 py-2 rounded-sm border border-stone-300 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-sm"
+                  />
+                  <button
+                    onClick={() => handleSave(key)}
+                    disabled={!isDirty(key) || savingKey === key}
+                    className="text-xs bg-primary hover:bg-primary-dark text-white px-4 py-2.5 rounded transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    {savingKey === key ? "Saving..." : "Save"}
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
