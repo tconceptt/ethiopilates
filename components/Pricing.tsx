@@ -53,6 +53,114 @@ const programs: Program[] = [
   },
 ];
 
+type Tier = {
+  duration: string;
+  price: string;
+  note?: string;
+};
+
+type Package = {
+  title: string;
+  subtitle?: string;
+  tiers: Tier[];
+};
+
+const memberships: Package[] = [
+  {
+    title: "Standard Access",
+    subtitle: "Yoga + Hot Pilates — unlimited classes",
+    tiers: [
+      { duration: "Drop-in", price: "2,500" },
+      { duration: "1 Month", price: "8,000" },
+      { duration: "3 Months", price: "20,000" },
+      { duration: "6 Months", price: "35,000" },
+      { duration: "1 Year", price: "55,000" },
+    ],
+  },
+  {
+    title: "Premium Access",
+    subtitle: "Yoga + Mat Pilates + Hot Pilates + Reformer",
+    tiers: [
+      { duration: "1 Month", price: "35,000", note: "one class per week for each service" },
+      { duration: "3 Months", price: "80,000", note: "4 classes for each service" },
+      { duration: "6 Months", price: "130,000", note: "8 classes for each service" },
+    ],
+  },
+];
+
+const classPackages: Package[] = [
+  {
+    title: "Hot Pilates",
+    tiers: [
+      { duration: "Drop-in", price: "2,000" },
+      { duration: "1 Month", price: "6,000", note: "4 classes" },
+      { duration: "3 Months", price: "10,000", note: "8 classes" },
+      { duration: "6 Months", price: "15,000", note: "16 classes" },
+      { duration: "1 Year", price: "20,000", note: "32 classes" },
+    ],
+  },
+  {
+    title: "Reformer Pilates",
+    tiers: [
+      { duration: "Drop-in", price: "4,500" },
+      { duration: "1 Month", price: "15,000", note: "4 classes" },
+      { duration: "3 Months", price: "35,000", note: "12 classes" },
+      { duration: "6 Months", price: "50,000", note: "24 classes" },
+      { duration: "1 Year", price: "80,000" },
+    ],
+  },
+  {
+    title: "Mat Pilates",
+    tiers: [
+      { duration: "Drop-in", price: "2,000" },
+      { duration: "1 Month", price: "10,000", note: "8 classes" },
+      { duration: "3 Months", price: "25,000", note: "24 classes" },
+      { duration: "6 Months", price: "40,000", note: "48 classes" },
+      { duration: "1 Year", price: "60,000", note: "96 classes" },
+    ],
+  },
+  {
+    title: "Yoga",
+    tiers: [
+      { duration: "Drop-in", price: "2,000" },
+      { duration: "1 Month", price: "6,000", note: "4 classes" },
+      { duration: "3 Months", price: "10,000", note: "8 classes" },
+      { duration: "6 Months", price: "15,000", note: "16 classes" },
+      { duration: "1 Year", price: "20,000", note: "32 classes" },
+    ],
+  },
+];
+
+const specialtyPrograms: Package[] = [
+  {
+    title: "Pregnancy Yoga",
+    tiers: [
+      { duration: "Drop-in", price: "2,500" },
+      { duration: "1 Month", price: "8,000" },
+      { duration: "3 Months", price: "20,000" },
+      { duration: "6 Months", price: "30,000" },
+    ],
+  },
+  {
+    title: "Kids / Beginner Ballet",
+    tiers: [
+      { duration: "Drop-in", price: "1,500" },
+      { duration: "1 Month", price: "3,500" },
+      { duration: "3 Months", price: "9,500" },
+      { duration: "6 Months", price: "17,000" },
+      { duration: "1 Year", price: "32,000" },
+    ],
+  },
+  {
+    title: "VIP / Private Training",
+    subtitle: "Free infused water, matcha",
+    tiers: [
+      { duration: "1 Session", price: "10,000" },
+      { duration: "4 Sessions", price: "30,000" },
+    ],
+  },
+];
+
 const included = [
   "All equipment & studio access",
   "Expert instruction",
@@ -175,6 +283,150 @@ export default function Pricing() {
           ))}
         </div>
 
+        {/* Memberships */}
+        <div className="max-w-5xl mx-auto mt-20 md:mt-28">
+          <SectionHeading
+            title="Memberships"
+            kicker="Unlimited & multi-class access"
+          />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+            {memberships.map((pkg, index) => (
+              <motion.div
+                key={pkg.title}
+                initial={{ opacity: 0.15, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-60px" }}
+                transition={{ duration: 0.8, delay: index * 0.08, ease: EASE }}
+                className="bg-surface border border-secondary rounded-sm p-7 md:p-9 flex flex-col"
+              >
+                <h4 className="font-serif text-2xl text-primary-dark mb-1.5">
+                  {pkg.title}
+                </h4>
+                <p className="text-xs uppercase tracking-widest text-brass mb-7 pb-5 border-b border-secondary">
+                  {pkg.subtitle}
+                </p>
+                <ul className="space-y-4 flex-grow">
+                  {pkg.tiers.map((tier) => (
+                    <li
+                      key={tier.duration}
+                      className="flex justify-between items-baseline gap-4"
+                    >
+                      <span className="text-sm text-stone-600">
+                        {tier.duration}
+                      </span>
+                      <span className="text-right">
+                        <span className="font-serif text-xl text-foreground">
+                          {tier.price}
+                        </span>
+                        {tier.note && (
+                          <span className="block text-xs text-stone-500">
+                            {tier.note}
+                          </span>
+                        )}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+                <Link
+                  href="/register"
+                  className="mt-8 inline-block text-center px-6 py-3 rounded-sm text-sm uppercase tracking-widest border border-primary-dark text-primary-dark hover:bg-primary-dark hover:text-[#faf6ee] transition-colors duration-300"
+                >
+                  Get started
+                </Link>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+
+        {/* Class packages */}
+        <div className="max-w-5xl mx-auto mt-20 md:mt-28">
+          <SectionHeading
+            title="Class packages"
+            kicker="Pay per class type"
+          />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {classPackages.map((pkg, index) => (
+              <motion.div
+                key={pkg.title}
+                initial={{ opacity: 0.15, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-60px" }}
+                transition={{ duration: 0.8, delay: index * 0.06, ease: EASE }}
+                className="bg-surface border border-secondary rounded-sm p-6"
+              >
+                <h4 className="font-serif text-xl text-primary-dark mb-5 pb-4 border-b border-secondary">
+                  {pkg.title}
+                </h4>
+                <ul className="space-y-3.5">
+                  {pkg.tiers.map((tier) => (
+                    <li key={tier.duration}>
+                      <div className="flex justify-between items-baseline gap-3">
+                        <span className="text-sm text-stone-600">
+                          {tier.duration}
+                        </span>
+                        <span className="font-serif text-lg text-foreground">
+                          {tier.price}
+                        </span>
+                      </div>
+                      {tier.note && (
+                        <span className="block text-xs text-stone-500 text-right">
+                          {tier.note}
+                        </span>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+
+        {/* Specialty programs */}
+        <div className="max-w-5xl mx-auto mt-20 md:mt-28">
+          <SectionHeading
+            title="Specialty programs"
+            kicker="Focused & private sessions"
+          />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {specialtyPrograms.map((pkg, index) => (
+              <motion.div
+                key={pkg.title}
+                initial={{ opacity: 0.15, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-60px" }}
+                transition={{ duration: 0.8, delay: index * 0.06, ease: EASE }}
+                className="bg-primary-dark text-[#f5efe4] rounded-sm p-6 md:p-7"
+              >
+                <h4 className="font-serif text-xl text-[#faf6ee] mb-1.5">
+                  {pkg.title}
+                </h4>
+                <p
+                  className={`text-xs uppercase tracking-widest text-[#d3bd92] mb-5 pb-4 border-b border-[#f5efe4]/20 ${
+                    pkg.subtitle ? "" : "invisible"
+                  }`}
+                >
+                  {pkg.subtitle ?? "—"}
+                </p>
+                <ul className="space-y-3.5">
+                  {pkg.tiers.map((tier) => (
+                    <li
+                      key={tier.duration}
+                      className="flex justify-between items-baseline gap-3"
+                    >
+                      <span className="text-sm text-[#d8c8b2]">
+                        {tier.duration}
+                      </span>
+                      <span className="font-serif text-lg text-[#faf6ee]">
+                        {tier.price}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+
         <motion.div
           initial={{ opacity: 0.2, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -221,5 +473,25 @@ export default function Pricing() {
         </motion.div>
       </div>
     </section>
+  );
+}
+
+function SectionHeading({ title, kicker }: { title: string; kicker: string }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0.2, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-60px" }}
+      transition={{ duration: 0.8, ease: EASE }}
+      className="text-center mb-10 md:mb-14"
+    >
+      <p className="text-xs uppercase tracking-widest text-brass mb-3">
+        {kicker}
+      </p>
+      <h3 className="font-serif text-3xl md:text-4xl text-primary-dark">
+        {title}
+      </h3>
+      <div className="w-16 h-px bg-brass mx-auto mt-6"></div>
+    </motion.div>
   );
 }
