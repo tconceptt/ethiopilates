@@ -12,7 +12,7 @@ import { CLASSES, toDateKey, type ClassKey, type DayKey } from "../../lib/classe
 const PAYMENT_DETAILS = {
   bankName: "Tele Birr",
   accountName: "Ethio Pilates",
-  accountNumber: "0996902970",
+  accountNumber: "0983314853",
   whatsappNumber: "+251 99 690 2970",
   whatsappLink: "https://wa.me/251996902970",
 };
