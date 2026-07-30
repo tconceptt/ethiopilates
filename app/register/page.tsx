@@ -13,8 +13,8 @@ const PAYMENT_DETAILS = {
   bankName: "Tele Birr",
   accountName: "Ethio Pilates",
   accountNumber: "0983314853",
-  whatsappNumber: "+251 99 690 2970",
-  whatsappLink: "https://wa.me/251996902970",
+  whatsappNumber: "+251 98 331 4853",
+  whatsappLink: "https://wa.me/251983314853",
 };
 
 const ADVANCE_PAYMENT = 1500;
