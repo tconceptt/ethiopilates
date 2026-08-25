@@ -3,179 +3,20 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { Check } from "lucide-react";
+import { pricingSection, usePricing, useSettings } from "../lib/content";
+import type { PricingGroupContent } from "../convex/defaults";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
-type Plan = {
-  duration: string;
-  sessions: number;
-  price: string;
-};
-
-type Program = {
-  title: string;
-  frequency: string;
-  plans: Plan[];
-  featured?: boolean;
-};
-
-const programs: Program[] = [
-  {
-    title: "Group Reformer",
-    frequency: "2 sessions a week",
-    plans: [
-      { duration: "1 Month", sessions: 8, price: "30,000" },
-      { duration: "3 Months", sessions: 24, price: "50,000" },
-      { duration: "6 Months", sessions: 48, price: "80,000" },
-      { duration: "1 Year", sessions: 96, price: "150,000" },
-    ],
-  },
-  {
-    title: "Group Reformer",
-    frequency: "3 sessions a week",
-    featured: true,
-    plans: [
-      { duration: "1 Month", sessions: 12, price: "40,000" },
-      { duration: "3 Months", sessions: 36, price: "100,000" },
-      { duration: "6 Months", sessions: 72, price: "180,000" },
-      { duration: "1 Year", sessions: 144, price: "300,000" },
-    ],
-  },
-  {
-    title: "Group Hot Pilates",
-    frequency: "3 sessions a week",
-    plans: [
-      { duration: "1 Month", sessions: 12, price: "20,000" },
-      { duration: "3 Months", sessions: 36, price: "50,000" },
-      { duration: "6 Months", sessions: 72, price: "80,000" },
-      { duration: "1 Year", sessions: 144, price: "120,000" },
-    ],
-  },
-];
-
-type Tier = {
-  duration: string;
-  price: string;
-  note?: string;
-};
-
-type Package = {
-  title: string;
-  subtitle?: string;
-  tiers: Tier[];
-};
-
-const memberships: Package[] = [
-  {
-    title: "Standard Access",
-    subtitle: "Yoga + Hot Pilates — unlimited classes",
-    tiers: [
-      { duration: "Drop-in", price: "2,500" },
-      { duration: "1 Month", price: "8,000" },
-      { duration: "3 Months", price: "20,000" },
-      { duration: "6 Months", price: "35,000" },
-      { duration: "1 Year", price: "55,000" },
-    ],
-  },
-  {
-    title: "Premium Access",
-    subtitle: "Yoga + Mat Pilates + Hot Pilates + Reformer",
-    tiers: [
-      { duration: "1 Month", price: "35,000", note: "one class per week for each service" },
-      { duration: "3 Months", price: "80,000", note: "4 classes for each service" },
-      { duration: "6 Months", price: "130,000", note: "8 classes for each service" },
-    ],
-  },
-];
-
-const classPackages: Package[] = [
-  {
-    title: "Hot Pilates",
-    tiers: [
-      { duration: "Drop-in", price: "2,000" },
-      { duration: "1 Month", price: "6,000", note: "4 classes" },
-      { duration: "3 Months", price: "10,000", note: "8 classes" },
-      { duration: "6 Months", price: "15,000", note: "16 classes" },
-      { duration: "1 Year", price: "20,000", note: "32 classes" },
-    ],
-  },
-  {
-    title: "Reformer Pilates",
-    tiers: [
-      { duration: "Drop-in", price: "4,500" },
-      { duration: "1 Month", price: "15,000", note: "4 classes" },
-      { duration: "3 Months", price: "35,000", note: "12 classes" },
-      { duration: "6 Months", price: "50,000", note: "24 classes" },
-      { duration: "1 Year", price: "80,000" },
-    ],
-  },
-  {
-    title: "Mat Pilates",
-    tiers: [
-      { duration: "Drop-in", price: "2,000" },
-      { duration: "1 Month", price: "10,000", note: "8 classes" },
-      { duration: "3 Months", price: "25,000", note: "24 classes" },
-      { duration: "6 Months", price: "40,000", note: "48 classes" },
-      { duration: "1 Year", price: "60,000", note: "96 classes" },
-    ],
-  },
-  {
-    title: "Yoga",
-    tiers: [
-      { duration: "Drop-in", price: "2,000" },
-      { duration: "1 Month", price: "6,000", note: "4 classes" },
-      { duration: "3 Months", price: "10,000", note: "8 classes" },
-      { duration: "6 Months", price: "15,000", note: "16 classes" },
-      { duration: "1 Year", price: "20,000", note: "32 classes" },
-    ],
-  },
-];
-
-const specialtyPrograms: Package[] = [
-  {
-    title: "Pregnancy Yoga",
-    tiers: [
-      { duration: "Drop-in", price: "2,500" },
-      { duration: "1 Month", price: "8,000" },
-      { duration: "3 Months", price: "20,000" },
-      { duration: "6 Months", price: "30,000" },
-    ],
-  },
-  {
-    title: "Kids / Beginner Ballet",
-    tiers: [
-      { duration: "Drop-in", price: "1,500" },
-      { duration: "1 Month", price: "3,500" },
-      { duration: "3 Months", price: "9,500" },
-      { duration: "6 Months", price: "17,000" },
-      { duration: "1 Year", price: "32,000" },
-    ],
-  },
-  {
-    title: "VIP / Private Training",
-    subtitle: "Free infused water, matcha",
-    tiers: [
-      { duration: "1 Session", price: "10,000" },
-      { duration: "4 Sessions", price: "30,000" },
-    ],
-  },
-];
-
-const included = [
-  "All equipment & studio access",
-  "Expert instruction",
-  "Safe & supportive environment",
-  "Progress tracking",
-  "Free water, sauna, ice bath & red light therapy",
-];
-
-const policies = [
-  "Sessions are non-refundable and non-transferable.",
-  "24-hour cancellation notice required.",
-  "Missed sessions cannot be rescheduled.",
-];
-
 export default function Pricing() {
+  const { groups, isLoading } = usePricing();
+  const { settings } = useSettings();
+
+  const programs = pricingSection(groups, "programs");
+  const memberships = pricingSection(groups, "memberships");
+  const classPackages = pricingSection(groups, "classPackages");
+  const specialtyPrograms = pricingSection(groups, "specialty");
+
   return (
     <section id="pricing" className="py-20 md:py-32 bg-background">
       <div className="container mx-auto px-6 md:px-12">
@@ -190,17 +31,21 @@ export default function Pricing() {
             Pilates packages
           </h2>
           <div className="w-16 h-px bg-brass mx-auto mb-6"></div>
-          <p className="text-stone-700 leading-relaxed">
-            Invest in your body. Embrace the journey. Thrive every day.
-            <br />
-            All prices in ETB.
+          <p className="text-stone-700 leading-relaxed whitespace-pre-line">
+            {settings.pricingIntro}
           </p>
         </motion.div>
+
+        {isLoading && (
+          <div className="flex justify-center py-16">
+            <div className="w-8 h-8 border-4 border-secondary border-t-brass rounded-full animate-spin"></div>
+          </div>
+        )}
 
         <div className="max-w-5xl mx-auto space-y-8 md:space-y-10">
           {programs.map((program, index) => (
             <motion.div
-              key={`${program.title}-${program.frequency}`}
+              key={groupKey(program, index)}
               initial={{ opacity: 0.15, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-60px" }}
@@ -224,34 +69,36 @@ export default function Pricing() {
                     program.featured ? "text-[#d3bd92]" : "text-brass"
                   }`}
                 >
-                  {program.frequency}
+                  {program.subtitle}
                 </p>
               </div>
 
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-8">
-                {program.plans.map((plan) => (
-                  <div key={plan.duration}>
+                {program.tiers.map((tier, tierIndex) => (
+                  <div key={`${tier.label}-${tierIndex}`}>
                     <p
                       className={`text-sm mb-2 ${
                         program.featured ? "text-[#d8c8b2]" : "text-stone-600"
                       }`}
                     >
-                      {plan.duration}
+                      {tier.label}
                     </p>
                     <p
                       className={`font-serif text-3xl md:text-4xl leading-none mb-1.5 ${
                         program.featured ? "text-[#faf6ee]" : "text-foreground"
                       }`}
                     >
-                      {plan.price}
+                      {tier.price}
                     </p>
-                    <p
-                      className={`text-xs uppercase tracking-wider ${
-                        program.featured ? "text-[#d8c8b2]" : "text-stone-500"
-                      }`}
-                    >
-                      {plan.sessions} sessions
-                    </p>
+                    {tier.note && (
+                      <p
+                        className={`text-xs uppercase tracking-wider ${
+                          program.featured ? "text-[#d8c8b2]" : "text-stone-500"
+                        }`}
+                      >
+                        {tier.note}
+                      </p>
+                    )}
                   </div>
                 ))}
               </div>
@@ -284,7 +131,7 @@ export default function Pricing() {
         </div>
 
         {/* Memberships */}
-        <div className="max-w-5xl mx-auto mt-20 md:mt-28">
+        <div className={`max-w-5xl mx-auto mt-20 md:mt-28 ${memberships.length ? "" : "hidden"}`}>
           <SectionHeading
             title="Memberships"
             kicker="Unlimited & multi-class access"
@@ -292,7 +139,7 @@ export default function Pricing() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
             {memberships.map((pkg, index) => (
               <motion.div
-                key={pkg.title}
+                key={groupKey(pkg, index)}
                 initial={{ opacity: 0.15, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-60px" }}
@@ -306,13 +153,13 @@ export default function Pricing() {
                   {pkg.subtitle}
                 </p>
                 <ul className="space-y-4 flex-grow">
-                  {pkg.tiers.map((tier) => (
+                  {pkg.tiers.map((tier, tierIndex) => (
                     <li
-                      key={tier.duration}
+                      key={`${tier.label}-${tierIndex}`}
                       className="flex justify-between items-baseline gap-4"
                     >
                       <span className="text-sm text-stone-600">
-                        {tier.duration}
+                        {tier.label}
                       </span>
                       <span className="text-right">
                         <span className="font-serif text-xl text-foreground">
@@ -339,7 +186,7 @@ export default function Pricing() {
         </div>
 
         {/* Class packages */}
-        <div className="max-w-5xl mx-auto mt-20 md:mt-28">
+        <div className={`max-w-5xl mx-auto mt-20 md:mt-28 ${classPackages.length ? "" : "hidden"}`}>
           <SectionHeading
             title="Class packages"
             kicker="Pay per class type"
@@ -347,7 +194,7 @@ export default function Pricing() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {classPackages.map((pkg, index) => (
               <motion.div
-                key={pkg.title}
+                key={groupKey(pkg, index)}
                 initial={{ opacity: 0.15, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-60px" }}
@@ -358,11 +205,11 @@ export default function Pricing() {
                   {pkg.title}
                 </h4>
                 <ul className="space-y-3.5">
-                  {pkg.tiers.map((tier) => (
-                    <li key={tier.duration}>
+                  {pkg.tiers.map((tier, tierIndex) => (
+                    <li key={`${tier.label}-${tierIndex}`}>
                       <div className="flex justify-between items-baseline gap-3">
                         <span className="text-sm text-stone-600">
-                          {tier.duration}
+                          {tier.label}
                         </span>
                         <span className="font-serif text-lg text-foreground">
                           {tier.price}
@@ -382,7 +229,11 @@ export default function Pricing() {
         </div>
 
         {/* Specialty programs */}
-        <div className="max-w-5xl mx-auto mt-20 md:mt-28">
+        <div
+          className={`max-w-5xl mx-auto mt-20 md:mt-28 ${
+            specialtyPrograms.length ? "" : "hidden"
+          }`}
+        >
           <SectionHeading
             title="Specialty programs"
             kicker="Focused & private sessions"
@@ -390,7 +241,7 @@ export default function Pricing() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {specialtyPrograms.map((pkg, index) => (
               <motion.div
-                key={pkg.title}
+                key={groupKey(pkg, index)}
                 initial={{ opacity: 0.15, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-60px" }}
@@ -408,13 +259,13 @@ export default function Pricing() {
                   {pkg.subtitle ?? "—"}
                 </p>
                 <ul className="space-y-3.5">
-                  {pkg.tiers.map((tier) => (
+                  {pkg.tiers.map((tier, tierIndex) => (
                     <li
-                      key={tier.duration}
+                      key={`${tier.label}-${tierIndex}`}
                       className="flex justify-between items-baseline gap-3"
                     >
                       <span className="text-sm text-[#d8c8b2]">
-                        {tier.duration}
+                        {tier.label}
                       </span>
                       <span className="font-serif text-lg text-[#faf6ee]">
                         {tier.price}
@@ -439,7 +290,7 @@ export default function Pricing() {
               What&apos;s included
             </h3>
             <ul className="space-y-3.5">
-              {included.map((item) => (
+              {settings.included.map((item) => (
                 <li key={item} className="flex items-start gap-3">
                   <Check
                     aria-hidden
@@ -457,7 +308,7 @@ export default function Pricing() {
               Studio policies
             </h3>
             <ul className="space-y-3.5">
-              {policies.map((item) => (
+              {settings.policies.map((item) => (
                 <li
                   key={item}
                   className="text-stone-700 leading-relaxed border-b border-secondary pb-3.5"
@@ -474,6 +325,11 @@ export default function Pricing() {
       </div>
     </section>
   );
+}
+
+/** Titles repeat across sections (two "Group Reformer" cards), so include the index. */
+function groupKey(group: PricingGroupContent, index: number): string {
+  return `${group.title}-${group.subtitle ?? ""}-${index}`;
 }
 
 function SectionHeading({ title, kicker }: { title: string; kicker: string }) {

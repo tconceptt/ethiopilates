@@ -1,5 +1,6 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
+import { capacityForClass } from "./classes";
 
 export const get = query({
   args: {},
@@ -28,11 +29,8 @@ export const create = mutation({
     // Enforce capacity when the class has a limit configured. Mutations are
     // transactions, so concurrent bookings can't oversell the slot.
     if (args.classKey && args.classDate && args.classSlot) {
-      const setting = await ctx.db
-        .query("classSettings")
-        .withIndex("by_classKey", (q) => q.eq("classKey", args.classKey!))
-        .unique();
-      if (setting?.capacity !== undefined) {
+      const capacity = await capacityForClass(ctx, args.classKey);
+      if (capacity !== null) {
         const existing = await ctx.db
           .query("registrations")
           .withIndex("by_classKey_and_classDate_and_classSlot", (q) =>
@@ -43,7 +41,7 @@ export const create = mutation({
           )
           .take(500);
         const active = existing.filter((r) => r.status !== "cancelled").length;
-        if (active >= setting.capacity) {
+        if (active >= capacity) {
           throw new Error("CLASS_FULL");
         }
       }

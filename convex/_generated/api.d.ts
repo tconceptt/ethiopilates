@@ -9,7 +9,11 @@
  */
 
 import type * as classes from "../classes.js";
+import type * as content from "../content.js";
+import type * as defaults from "../defaults.js";
+import type * as pricing from "../pricing.js";
 import type * as registrations from "../registrations.js";
+import type * as settings from "../settings.js";
 
 import type {
   ApiFromModules,
@@ -19,7 +23,11 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   classes: typeof classes;
+  content: typeof content;
+  defaults: typeof defaults;
+  pricing: typeof pricing;
   registrations: typeof registrations;
+  settings: typeof settings;
 }>;
 
 /**

@@ -7,7 +7,19 @@ import { ArrowLeft, Check, X, Clock, Users } from "lucide-react";
 import Image from "next/image";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
-import { CLASSES, CLASS_KEYS, type ClassKey } from "../../lib/classes";
+import type { Id } from "../../convex/_generated/dataModel";
+import ClassesEditor from "./ClassesEditor";
+import PricingEditor from "./PricingEditor";
+import SettingsEditor from "./SettingsEditor";
+
+const TABS = [
+  { id: "registrations", label: "Registrations" },
+  { id: "classes", label: "Classes & schedule" },
+  { id: "pricing", label: "Prices" },
+  { id: "settings", label: "Settings" },
+] as const;
+
+type TabId = (typeof TABS)[number]["id"];
 
 export default function Members() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -15,6 +27,7 @@ export default function Members() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [tab, setTab] = useState<TabId>("registrations");
 
   useEffect(() => {
     const isAuth = localStorage.getItem("adminAuth") === "true";
@@ -26,6 +39,15 @@ export default function Members() {
 
   const registrations = useQuery(api.registrations.get);
   const updateStatus = useMutation(api.registrations.updateStatus);
+  const seedIfEmpty = useMutation(api.content.seedIfEmpty);
+
+  // The editable tables start empty; the public site renders built-in defaults
+  // until they're filled in. Seeding here means the first admin visit turns
+  // those defaults into editable rows without a manual migration step.
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    seedIfEmpty().catch((err) => console.error("Failed to seed content:", err));
+  }, [isAuthenticated, seedIfEmpty]);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,7 +65,7 @@ export default function Members() {
     localStorage.removeItem("adminAuth");
   };
 
-  const handleUpdateStatus = async (id: any, status: string) => {
+  const handleUpdateStatus = async (id: Id<"registrations">, status: string) => {
     try {
       await updateStatus({ id, status });
     } catch (err) {
@@ -161,9 +183,34 @@ export default function Members() {
         </div>
       </header>
 
+      <div className="bg-white border-b border-stone-200 sticky top-0 z-10 shadow-sm">
+        <div className="container mx-auto max-w-6xl px-4 md:px-6">
+          <nav className="flex gap-1 overflow-x-auto -mb-px">
+            {TABS.map((t) => (
+              <button
+                key={t.id}
+                type="button"
+                onClick={() => setTab(t.id)}
+                className={`whitespace-nowrap px-4 py-4 text-xs uppercase tracking-widest border-b-2 transition-colors ${
+                  tab === t.id
+                    ? "border-primary text-primary-dark font-medium"
+                    : "border-transparent text-stone-500 hover:text-primary"
+                }`}
+              >
+                {t.label}
+              </button>
+            ))}
+          </nav>
+        </div>
+      </div>
+
       <main className="flex-grow py-8 px-4 md:px-6">
         <div className="container mx-auto max-w-6xl">
-          
+          {tab === "classes" && <ClassesEditor />}
+          {tab === "pricing" && <PricingEditor />}
+          {tab === "settings" && <SettingsEditor />}
+
+          <div className={tab === "registrations" ? "" : "hidden"}>
           {/* Summary Dashboard */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
             <div className="bg-white p-6 rounded-sm shadow-sm border border-stone-100 flex items-center justify-between">
@@ -185,8 +232,6 @@ export default function Members() {
               </div>
             </div>
           </div>
-
-          <ClassCapacitySettings />
 
           <div className="bg-white rounded-sm shadow-md overflow-hidden">
             <div className="p-6 md:p-8 border-b border-stone-100 bg-stone-50/50">
@@ -418,113 +463,9 @@ export default function Members() {
               )}
             </div>
           </div>
+          </div>
         </div>
       </main>
-    </div>
-  );
-}
-
-function ClassCapacitySettings() {
-  const settings = useQuery(api.classes.getSettings);
-  const setCapacity = useMutation(api.classes.setCapacity);
-  const [drafts, setDrafts] = useState<Partial<Record<ClassKey, string>>>({});
-  const [savingKey, setSavingKey] = useState<ClassKey | null>(null);
-
-  const savedCapacity = (key: ClassKey): number | null => {
-    const setting = settings?.find((s) => s.classKey === key);
-    return setting?.capacity ?? null;
-  };
-
-  const draftValue = (key: ClassKey): string => {
-    const draft = drafts[key];
-    if (draft !== undefined) return draft;
-    const saved = savedCapacity(key);
-    return saved === null ? "" : String(saved);
-  };
-
-  const isDirty = (key: ClassKey): boolean => {
-    const draft = drafts[key];
-    if (draft === undefined) return false;
-    const saved = savedCapacity(key);
-    return draft !== (saved === null ? "" : String(saved));
-  };
-
-  const handleSave = async (key: ClassKey) => {
-    const raw = draftValue(key).trim();
-    const parsed = raw === "" ? null : Number(raw);
-    if (parsed !== null && (!Number.isFinite(parsed) || parsed < 1)) {
-      alert("Capacity must be a number of 1 or more, or empty for no limit.");
-      return;
-    }
-    setSavingKey(key);
-    try {
-      await setCapacity({ classKey: key, capacity: parsed });
-      setDrafts((prev) => {
-        const next = { ...prev };
-        delete next[key];
-        return next;
-      });
-    } catch (err) {
-      console.error("Failed to save capacity:", err);
-      alert("Failed to save capacity.");
-    } finally {
-      setSavingKey(null);
-    }
-  };
-
-  return (
-    <div className="bg-white rounded-sm shadow-md overflow-hidden mb-8">
-      <div className="p-6 md:p-8 border-b border-stone-100 bg-stone-50/50">
-        <h2 className="font-serif text-2xl text-primary-dark mb-1">Class Capacity</h2>
-        <p className="text-sm text-stone-500">
-          Set spots per time slot for each class. Leave empty for no limit — capacity is
-          only shown to customers when set.
-        </p>
-      </div>
-      {settings === undefined ? (
-        <div className="text-center py-10 text-stone-500 flex flex-col items-center gap-3">
-          <div className="w-6 h-6 border-4 border-stone-200 border-t-primary rounded-full animate-spin"></div>
-          <p className="text-sm">Loading settings...</p>
-        </div>
-      ) : (
-        <div className="divide-y divide-stone-100">
-          {CLASS_KEYS.map((key) => {
-            const saved = savedCapacity(key);
-            return (
-              <div
-                key={key}
-                className="flex flex-wrap items-center justify-between gap-3 px-6 md:px-8 py-4"
-              >
-                <div className="min-w-0">
-                  <div className="font-medium text-stone-800">{CLASSES[key].label}</div>
-                  <div className="text-xs text-stone-500 mt-0.5">
-                    {saved === null ? "No limit set" : `${saved} spots per slot`}
-                  </div>
-                </div>
-                <div className="flex items-center gap-2 shrink-0">
-                  <input
-                    type="number"
-                    min={1}
-                    value={draftValue(key)}
-                    onChange={(e) =>
-                      setDrafts((prev) => ({ ...prev, [key]: e.target.value }))
-                    }
-                    placeholder="No limit"
-                    className="w-24 px-3 py-2 rounded-sm border border-stone-300 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-sm"
-                  />
-                  <button
-                    onClick={() => handleSave(key)}
-                    disabled={!isDirty(key) || savingKey === key}
-                    className="text-xs bg-primary hover:bg-primary-dark text-white px-4 py-2.5 rounded transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-                  >
-                    {savingKey === key ? "Saving..." : "Save"}
-                  </button>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
     </div>
   );
 }

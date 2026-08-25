@@ -7,27 +7,9 @@ import { ArrowLeft, ArrowRight, Check, ChevronLeft, ChevronRight, Copy, Clock, E
 import Image from "next/image";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
-import { CLASSES, toDateKey, type ClassKey, type DayKey } from "../../lib/classes";
-
-const PAYMENT_DETAILS = {
-  bankName: "Tele Birr",
-  accountName: "Ethio Pilates",
-  accountNumber: "0983314853",
-  whatsappNumber: "+251 98 331 4853",
-  whatsappLink: "https://wa.me/251983314853",
-};
-
-const ADVANCE_PAYMENT = 1500;
-
-const JS_DAY_TO_KEY: Record<number, DayKey | null> = {
-  0: null,
-  1: "Mon",
-  2: "Tue",
-  3: "Wed",
-  4: "Thu",
-  5: "Fri",
-  6: "Sat",
-};
+import { slotsForDate, toDateKey, type ClassKey, type SiteClass } from "../../lib/classes";
+import { useClasses, useSettings } from "../../lib/content";
+import { whatsappLink, type SettingsContent } from "../../convex/defaults";
 
 function startOfToday(): Date {
   const d = new Date();
@@ -63,16 +45,10 @@ function relativeLabel(date: Date, today: Date): string | null {
   return null;
 }
 
-function slotsForDate(classKey: ClassKey, date: Date): string[] {
-  const k = JS_DAY_TO_KEY[date.getDay()];
-  if (!k) return [];
-  return CLASSES[classKey].schedule[k] || [];
-}
-
 const SEARCH_HORIZON_DAYS = 60;
 
 function findNextAvailable(
-  classKey: ClassKey,
+  cls: SiteClass,
   from: Date,
   direction: 1 | -1,
   earliest: Date,
@@ -80,15 +56,15 @@ function findNextAvailable(
   for (let i = 1; i <= SEARCH_HORIZON_DAYS; i++) {
     const d = addDays(from, direction * i);
     if (direction === -1 && d < earliest) return null;
-    if (slotsForDate(classKey, d).length) return d;
+    if (slotsForDate(cls, d).length) return d;
   }
   return null;
 }
 
-function findFirstAvailable(classKey: ClassKey, from: Date): Date | null {
+function findFirstAvailable(cls: SiteClass, from: Date): Date | null {
   for (let i = 0; i <= SEARCH_HORIZON_DAYS; i++) {
     const d = addDays(from, i);
-    if (slotsForDate(classKey, d).length) return d;
+    if (slotsForDate(cls, d).length) return d;
   }
   return null;
 }
@@ -108,7 +84,11 @@ export default function Register() {
 
   const today = useMemo(() => startOfToday(), []);
 
+  const { classes, isLoading: classesLoading } = useClasses();
+  const { settings } = useSettings();
   const createRegistration = useMutation(api.registrations.create);
+
+  const selectedClassInfo = classes.find((c) => c.key === selectedClass) ?? null;
 
   const availability = useQuery(
     api.classes.availability,
@@ -129,9 +109,9 @@ export default function Register() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handlePickClass = (key: ClassKey) => {
-    setSelectedClass(key);
-    const first = findFirstAvailable(key, today);
+  const handlePickClass = (cls: SiteClass) => {
+    setSelectedClass(cls.key);
+    const first = findFirstAvailable(cls, today);
     setDisplayedDate(first);
     setSelectedDate(null);
     setSelectedSlot(null);
@@ -144,8 +124,8 @@ export default function Register() {
   };
 
   const handleDayNav = (direction: 1 | -1) => {
-    if (!selectedClass || !displayedDate) return;
-    const next = findNextAvailable(selectedClass, displayedDate, direction, today);
+    if (!selectedClassInfo || !displayedDate) return;
+    const next = findNextAvailable(selectedClassInfo, displayedDate, direction, today);
     if (next) setDisplayedDate(next);
   };
 
@@ -171,10 +151,9 @@ export default function Register() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedClass || !selectedDate || !selectedSlot) return;
+    if (!selectedClassInfo || !selectedDate || !selectedSlot) return;
     setIsSubmitting(true);
 
-    const cls = CLASSES[selectedClass];
     const label = `${formatLongDate(selectedDate)} — ${selectedSlot}`;
 
     try {
@@ -183,12 +162,12 @@ export default function Register() {
         lastName: formData.lastName,
         email: !isMember && formData.email ? formData.email : undefined,
         phone: isMember ? undefined : formData.phone,
-        package: cls.label,
-        price: isMember ? 0 : ADVANCE_PAYMENT,
+        package: selectedClassInfo.label,
+        price: isMember ? 0 : settings.advancePayment,
         schedule: label,
         experienceLevel: "beginner",
         isMember,
-        classKey: selectedClass,
+        classKey: selectedClassInfo.key,
         classDate: toDateKey(selectedDate),
         classSlot: selectedSlot,
       });
@@ -207,19 +186,18 @@ export default function Register() {
     }
   };
 
-  const selectedClassInfo = selectedClass ? CLASSES[selectedClass] : null;
   const scheduleLabel =
     selectedDate && selectedSlot ? `${formatLongDate(selectedDate)} — ${selectedSlot}` : null;
 
   const displayedSlots =
-    selectedClass && displayedDate ? slotsForDate(selectedClass, displayedDate) : [];
+    selectedClassInfo && displayedDate ? slotsForDate(selectedClassInfo, displayedDate) : [];
   const prevDate =
-    selectedClass && displayedDate
-      ? findNextAvailable(selectedClass, displayedDate, -1, today)
+    selectedClassInfo && displayedDate
+      ? findNextAvailable(selectedClassInfo, displayedDate, -1, today)
       : null;
   const nextDate =
-    selectedClass && displayedDate
-      ? findNextAvailable(selectedClass, displayedDate, 1, today)
+    selectedClassInfo && displayedDate
+      ? findNextAvailable(selectedClassInfo, displayedDate, 1, today)
       : null;
   const displayedRelative = displayedDate ? relativeLabel(displayedDate, today) : null;
 
@@ -313,12 +291,14 @@ export default function Register() {
                             We&apos;ve held your spot for{" "}
                             <span className="font-medium text-primary-dark">{selectedClassInfo?.label}</span> on{" "}
                             <span className="font-medium text-primary-dark">{scheduleLabel}</span>. Send the{" "}
-                            <span className="font-medium text-primary-dark">{ADVANCE_PAYMENT.toLocaleString()} ETB</span>{" "}
+                            <span className="font-medium text-primary-dark">
+                              {settings.advancePayment.toLocaleString()} ETB
+                            </span>{" "}
                             advance payment and the screenshot on WhatsApp to confirm.
                           </p>
                         </div>
                         <div className="max-w-md mx-auto">
-                          <PaymentBox onCopy={handleCopy} copied={copied} />
+                          <PaymentBox settings={settings} onCopy={handleCopy} copied={copied} />
                         </div>
                       </>
                     )}
@@ -341,15 +321,25 @@ export default function Register() {
                     <h2 className="font-serif text-xl sm:text-2xl text-primary-dark mb-2">Choose your class</h2>
                     <p className="text-sm text-stone-500 mb-6 sm:mb-8">Select the type of class you want to book.</p>
 
+                    {classesLoading ? (
+                      <div className="flex flex-col items-center gap-3 py-12 text-stone-500">
+                        <div className="w-7 h-7 border-4 border-stone-200 border-t-primary rounded-full animate-spin"></div>
+                        <p className="text-sm">Loading classes...</p>
+                      </div>
+                    ) : classes.length === 0 ? (
+                      <p className="text-center text-sm text-stone-500 py-12">
+                        No classes are open for booking right now.
+                      </p>
+                    ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
-                      {(Object.keys(CLASSES) as ClassKey[]).map((key) => {
-                        const cls = CLASSES[key];
+                      {classes.map((cls) => {
+                        const key = cls.key;
                         const isSelected = selectedClass === key;
                         return (
                           <button
                             type="button"
                             key={key}
-                            onClick={() => handlePickClass(key)}
+                            onClick={() => handlePickClass(cls)}
                             className={`group text-left border rounded-sm p-4 sm:p-5 flex items-center justify-between gap-3 transition-all ${
                               isSelected
                                 ? "border-primary bg-primary/5"
@@ -368,6 +358,7 @@ export default function Register() {
                         );
                       })}
                     </div>
+                    )}
                   </motion.div>
                 ) : step === 2 ? (
                   <motion.div
@@ -676,7 +667,7 @@ export default function Register() {
                           </div>
                           <div className="min-w-0">
                             <p className="font-medium text-amber-900 text-sm sm:text-base">
-                              Advance payment of {ADVANCE_PAYMENT.toLocaleString()} ETB required
+                              Advance payment of {settings.advancePayment.toLocaleString()} ETB required
                             </p>
                             <p className="text-xs sm:text-sm text-amber-800/80 mt-0.5">
                               You&apos;ll receive payment instructions after submitting. Your booking is confirmed once
@@ -753,10 +744,12 @@ function Stepper({ step }: { step: Step }) {
 }
 
 function PaymentBox({
+  settings,
   onCopy,
   copied,
   compact = false,
 }: {
+  settings: SettingsContent;
   onCopy: (value: string) => void;
   copied: boolean;
   compact?: boolean;
@@ -793,11 +786,11 @@ function PaymentBox({
           </div>
           <div className="flex items-center justify-between gap-3">
             <span className="font-mono text-base sm:text-lg text-stone-800 tracking-wider">
-              {PAYMENT_DETAILS.accountNumber}
+              {settings.telebirrAccountNumber}
             </span>
             <button
               type="button"
-              onClick={() => onCopy(PAYMENT_DETAILS.accountNumber)}
+              onClick={() => onCopy(settings.telebirrAccountNumber)}
               className="inline-flex items-center gap-1.5 text-xs uppercase tracking-widest text-primary hover:text-primary-dark border border-primary/30 hover:border-primary px-3 py-1.5 rounded-sm transition-colors shrink-0"
             >
               {copied ? <Check size={12} /> : <Copy size={12} />}
@@ -809,7 +802,7 @@ function PaymentBox({
 
       {/* WhatsApp block */}
       <a
-        href={PAYMENT_DETAILS.whatsappLink}
+        href={whatsappLink(settings.whatsappNumber)}
         target="_blank"
         rel="noopener noreferrer"
         className="group block bg-[#25D366] hover:bg-[#1ebe5b] text-white rounded-sm p-4 sm:p-5 transition-colors shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-[#25D366] focus:ring-offset-2"
@@ -829,7 +822,7 @@ function PaymentBox({
               Send screenshot on WhatsApp
             </div>
             <div className="font-medium text-base sm:text-lg flex items-center gap-1.5">
-              <span className="truncate">{PAYMENT_DETAILS.whatsappNumber}</span>
+              <span className="truncate">{settings.whatsappNumber}</span>
               <ExternalLink
                 size={14}
                 className="opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all shrink-0"

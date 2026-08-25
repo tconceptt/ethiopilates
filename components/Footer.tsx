@@ -1,8 +1,13 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
 import { MapPin, Phone, Mail } from "lucide-react";
+import { useSettings } from "../lib/content";
 
 export default function Footer() {
+  const { settings } = useSettings();
+
   return (
     <footer className="bg-[#241a13] text-[#d8ccbd] pt-20 pb-10">
       <div className="container mx-auto px-6 md:px-12">
@@ -47,18 +52,22 @@ export default function Footer() {
               <li className="flex items-start gap-3">
                 <Phone size={18} className="text-[#c9a55e] mt-0.5" />
                 <div className="flex flex-col text-sm">
-                  <span>+251 92 917 7443</span>
-                  <span>+251 97 790 0331</span>
+                  {settings.contactPhones.map((phone) => (
+                    <span key={phone}>{phone}</span>
+                  ))}
                 </div>
               </li>
               <li className="flex items-start gap-3">
                 <MapPin size={18} className="text-[#c9a55e] mt-0.5" />
-                <span className="text-sm">Addis Ababa, Ethiopia</span>
+                <span className="text-sm">{settings.contactAddress}</span>
               </li>
               <li className="flex items-start gap-3">
                 <Mail size={18} className="text-[#c9a55e] mt-0.5" />
-                <a href="mailto:info@ethiopilates.com" className="text-sm hover:text-[#faf6ee] transition-colors">
-                  info@ethiopilates.com
+                <a
+                  href={`mailto:${settings.contactEmail}`}
+                  className="text-sm hover:text-[#faf6ee] transition-colors"
+                >
+                  {settings.contactEmail}
                 </a>
               </li>
             </ul>
