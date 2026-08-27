@@ -70,6 +70,15 @@ function SectionBlock({
 }) {
   const createGroup = useMutation(api.pricing.create);
 
+  const handleCreate = async () => {
+    try {
+      await createGroup({ section, title: "New package" });
+    } catch (err) {
+      console.error("Failed to add package:", err);
+      alert("Failed to add a package.");
+    }
+  };
+
   return (
     <div className="px-6 md:px-8 py-6">
       <div className="flex flex-wrap items-start justify-between gap-3 mb-5">
@@ -81,7 +90,7 @@ function SectionBlock({
         </div>
         <button
           type="button"
-          onClick={() => createGroup({ section, title: "New package" })}
+          onClick={handleCreate}
           className="inline-flex items-center gap-1.5 text-xs uppercase tracking-widest border border-primary text-primary hover:bg-primary hover:text-white px-4 py-2.5 rounded-sm transition-colors shrink-0"
         >
           <Plus size={14} />

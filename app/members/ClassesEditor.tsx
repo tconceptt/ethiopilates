@@ -6,6 +6,7 @@ import { ChevronDown, ChevronUp, Copy, Plus, Trash2 } from "lucide-react";
 import { api } from "../../convex/_generated/api";
 import type { Doc, Id } from "../../convex/_generated/dataModel";
 import { DAY_KEYS, DAY_LABELS, type DayKey, type ScheduleDay } from "../../lib/classes";
+import { PRICING_SECTION_LABELS } from "../../convex/defaults";
 import {
   Field,
   IconButton,
@@ -24,6 +25,8 @@ type ClassDraft = {
   showOnWeeklySchedule: boolean;
   /** Kept as text so "no limit" can be expressed as an empty field. */
   capacity: string;
+  /** Packages offered on the booking page. Empty means "offer them all". */
+  pricingGroupIds: Id<"pricingGroups">[];
   /** Always all seven days, so days can be filled in without extra state. */
   schedule: ScheduleDay[];
 };
@@ -43,6 +46,7 @@ function toDraft(doc: Doc<"classes">): ClassDraft {
     active: doc.active,
     showOnWeeklySchedule: doc.showOnWeeklySchedule,
     capacity: doc.capacity === undefined ? "" : String(doc.capacity),
+    pricingGroupIds: doc.pricingGroupIds ?? [],
     schedule: DAY_KEYS.map((day) => ({
       day,
       slots: doc.schedule.find((d) => d.day === day)?.slots ?? [],
@@ -52,6 +56,7 @@ function toDraft(doc: Doc<"classes">): ClassDraft {
 
 export default function ClassesEditor() {
   const classes = useQuery(api.classes.list);
+  const pricingGroups = useQuery(api.pricing.list);
   const createClass = useMutation(api.classes.create);
   const [isAdding, setIsAdding] = useState(false);
   const [newClass, setNewClass] = useState({ key: "", label: "", blurb: "" });
@@ -166,6 +171,7 @@ export default function ClassesEditor() {
             <ClassCard
               key={cls._id}
               cls={cls}
+              pricingGroups={pricingGroups ?? []}
               isFirst={index === 0}
               isLast={index === classes.length - 1}
             />
@@ -178,10 +184,12 @@ export default function ClassesEditor() {
 
 function ClassCard({
   cls,
+  pricingGroups,
   isFirst,
   isLast,
 }: {
   cls: Doc<"classes">;
+  pricingGroups: Doc<"pricingGroups">[];
   isFirst: boolean;
   isLast: boolean;
 }) {
@@ -224,6 +232,7 @@ function ClassCard({
         active: draft.active,
         showOnWeeklySchedule: draft.showOnWeeklySchedule,
         capacity: parsed,
+        pricingGroupIds: draft.pricingGroupIds,
         schedule: draft.schedule,
       });
       markSaved();
@@ -315,6 +324,58 @@ function ClassCard({
             onChange={(showOnWeeklySchedule) => update({ showOnWeeklySchedule })}
           />
         </div>
+      </div>
+
+      <div className="mb-6">
+        <span className="block text-xs font-semibold uppercase tracking-wider text-stone-500 mb-1.5">
+          Packages offered for this class
+        </span>
+        <p className="text-xs text-stone-400 mb-3">
+          Guests pick one of these when booking, and it sets the full price you collect.
+          Tick none to offer every package. Prices and drop-in rows are edited in the Prices tab.
+        </p>
+        {pricingGroups.length === 0 ? (
+          <p className="text-xs text-stone-400 italic">Loading packages...</p>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-2">
+            {pricingGroups.map((group) => {
+              const checked = draft.pricingGroupIds.includes(group._id);
+              return (
+                <label
+                  key={group._id}
+                  className={`flex items-start gap-2.5 rounded-sm border p-3 cursor-pointer select-none transition-colors ${
+                    checked
+                      ? "border-primary bg-primary/5"
+                      : "border-stone-200 hover:border-primary/40"
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    onChange={(e) =>
+                      update({
+                        pricingGroupIds: e.target.checked
+                          ? [...draft.pricingGroupIds, group._id]
+                          : draft.pricingGroupIds.filter((id) => id !== group._id),
+                      })
+                    }
+                    className="mt-0.5 w-4 h-4 accent-[var(--color-primary,#8a6a4f)] shrink-0"
+                  />
+                  <span className="min-w-0">
+                    <span className="block text-sm text-stone-700">{group.title}</span>
+                    {group.subtitle && (
+                      <span className="block text-xs text-stone-400">{group.subtitle}</span>
+                    )}
+                    <span className="block text-[11px] text-stone-400 mt-0.5">
+                      {PRICING_SECTION_LABELS[group.section]} ·{" "}
+                      {group.tiers.length} price row{group.tiers.length === 1 ? "" : "s"}
+                    </span>
+                  </span>
+                </label>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       <div>

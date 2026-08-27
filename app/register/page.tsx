@@ -8,7 +8,8 @@ import Image from "next/image";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { slotsForDate, toDateKey, type ClassKey, type SiteClass } from "../../lib/classes";
-import { useClasses, useSettings } from "../../lib/content";
+import { useClasses, usePricing, useSettings } from "../../lib/content";
+import { packageOptionsForClass, type PackageOption } from "../../lib/pricing";
 import { whatsappLink, type SettingsContent } from "../../convex/defaults";
 
 function startOfToday(): Date {
@@ -81,14 +82,25 @@ export default function Register() {
   const [isComplete, setIsComplete] = useState(false);
   const [copied, setCopied] = useState(false);
   const [isMember, setIsMember] = useState(false);
+  const [selectedPackageId, setSelectedPackageId] = useState<string | null>(null);
 
   const today = useMemo(() => startOfToday(), []);
 
   const { classes, isLoading: classesLoading } = useClasses();
+  const { groups: pricingGroups } = usePricing();
   const { settings } = useSettings();
   const createRegistration = useMutation(api.registrations.create);
 
   const selectedClassInfo = classes.find((c) => c.key === selectedClass) ?? null;
+
+  const packageOptions = useMemo(
+    () => packageOptionsForClass(pricingGroups, selectedClassInfo),
+    [pricingGroups, selectedClassInfo],
+  );
+  const selectedPackage =
+    packageOptions.find((o) => o.id === selectedPackageId) ?? null;
+  // Members are covered by their membership, so they never pick a package.
+  const needsPackage = !isMember && packageOptions.length > 0;
 
   const availability = useQuery(
     api.classes.availability,
@@ -115,6 +127,8 @@ export default function Register() {
     setDisplayedDate(first);
     setSelectedDate(null);
     setSelectedSlot(null);
+    // Packages are per class, so a previous pick no longer applies.
+    setSelectedPackageId(null);
     setStep(2);
   };
 
@@ -152,9 +166,13 @@ export default function Register() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedClassInfo || !selectedDate || !selectedSlot) return;
+    if (needsPackage && !selectedPackage) return;
     setIsSubmitting(true);
 
     const label = `${formatLongDate(selectedDate)} — ${selectedSlot}`;
+    // Members book on their membership — never attach a package to their row,
+    // even if they picked one before switching to "Member".
+    const bookedPackage = isMember ? null : selectedPackage;
 
     try {
       await createRegistration({
@@ -164,6 +182,11 @@ export default function Register() {
         phone: isMember ? undefined : formData.phone,
         package: selectedClassInfo.label,
         price: isMember ? 0 : settings.advancePayment,
+        packageTitle: bookedPackage?.title,
+        packageSubtitle: bookedPackage?.subtitle,
+        packageTier: bookedPackage?.tierLabel,
+        packagePrice: bookedPackage?.price ?? undefined,
+        packagePriceLabel: bookedPackage?.priceLabel,
         schedule: label,
         experienceLevel: "beginner",
         isMember,
@@ -296,6 +319,31 @@ export default function Register() {
                             </span>{" "}
                             advance payment and the screenshot on WhatsApp to confirm.
                           </p>
+                          {selectedPackage && (
+                            <p className="text-xs sm:text-sm text-stone-500 max-w-md mx-auto mt-3">
+                              Package:{" "}
+                              <span className="font-medium text-primary-dark">
+                                {selectedPackage.title}
+                                {selectedPackage.subtitle ? ` · ${selectedPackage.subtitle}` : ""}
+                                {" — "}
+                                {selectedPackage.tierLabel}
+                              </span>{" "}
+                              ({selectedPackage.priceLabel} ETB)
+                              {selectedPackage.price !== null && (
+                                <>
+                                  . Balance of{" "}
+                                  <span className="font-medium text-primary-dark">
+                                    {Math.max(
+                                      0,
+                                      selectedPackage.price - settings.advancePayment,
+                                    ).toLocaleString()}{" "}
+                                    ETB
+                                  </span>{" "}
+                                  is due at the studio.
+                                </>
+                              )}
+                            </p>
+                          )}
                         </div>
                         <div className="max-w-md mx-auto">
                           <PaymentBox settings={settings} onCopy={handleCopy} copied={copied} />
@@ -574,6 +622,24 @@ export default function Register() {
                         </div>
                       </section>
 
+                      {needsPackage && (
+                        <section>
+                          <h3 className="font-serif text-lg text-primary-dark mb-1 border-b border-stone-100 pb-2">
+                            Choose your package
+                          </h3>
+                          <p className="text-xs sm:text-sm text-stone-500 mb-4">
+                            Pick a single class or a package. You pay the{" "}
+                            {settings.advancePayment.toLocaleString()} ETB advance now and the
+                            balance at the studio.
+                          </p>
+                          <PackagePicker
+                            options={packageOptions}
+                            selectedId={selectedPackageId}
+                            onSelect={setSelectedPackageId}
+                          />
+                        </section>
+                      )}
+
                       <section>
                         <h3 className="font-serif text-lg text-primary-dark mb-4 border-b border-stone-100 pb-2">
                           Personal Information
@@ -669,6 +735,27 @@ export default function Register() {
                             <p className="font-medium text-amber-900 text-sm sm:text-base">
                               Advance payment of {settings.advancePayment.toLocaleString()} ETB required
                             </p>
+                            {selectedPackage && (
+                              <p className="text-xs sm:text-sm text-amber-900/90 mt-1">
+                                {selectedPackage.tierLabel} · {selectedPackage.title} —{" "}
+                                <span className="font-medium">
+                                  {selectedPackage.priceLabel} ETB
+                                </span>
+                                {selectedPackage.price !== null && (
+                                  <>
+                                    {", balance of "}
+                                    <span className="font-medium">
+                                      {Math.max(
+                                        0,
+                                        selectedPackage.price - settings.advancePayment,
+                                      ).toLocaleString()}{" "}
+                                      ETB
+                                    </span>
+                                    {" at the studio"}
+                                  </>
+                                )}
+                              </p>
+                            )}
                             <p className="text-xs sm:text-sm text-amber-800/80 mt-0.5">
                               You&apos;ll receive payment instructions after submitting. Your booking is confirmed once
                               we receive your screenshot on WhatsApp.
@@ -679,10 +766,16 @@ export default function Register() {
 
                       <button
                         type="submit"
-                        disabled={isSubmitting}
+                        disabled={isSubmitting || (needsPackage && !selectedPackage)}
                         className="w-full bg-primary hover:bg-primary-dark text-white py-4 rounded-sm text-sm uppercase tracking-widest transition-colors font-medium shadow-sm hover:shadow-md disabled:opacity-70 disabled:cursor-not-allowed"
                       >
-                        {isSubmitting ? "Submitting..." : isMember ? "Book My Spot" : "Reserve My Spot"}
+                        {isSubmitting
+                          ? "Submitting..."
+                          : needsPackage && !selectedPackage
+                            ? "Choose a package above"
+                            : isMember
+                              ? "Book My Spot"
+                              : "Reserve My Spot"}
                       </button>
 
                       {!isMember && (
@@ -698,6 +791,116 @@ export default function Register() {
           </motion.div>
         </div>
       </main>
+    </div>
+  );
+}
+
+/**
+ * Radio list of every price row the class offers.
+ *
+ * Drop-in rows come first under their own heading — they're the single-class
+ * option most first-timers want, and burying them among the multi-month
+ * packages makes the booking look like a commitment it isn't.
+ */
+function PackagePicker({
+  options,
+  selectedId,
+  onSelect,
+}: {
+  options: PackageOption[];
+  selectedId: string | null;
+  onSelect: (id: string) => void;
+}) {
+  const dropIns = options.filter((o) => o.isDropIn);
+  const packages = options.filter((o) => !o.isDropIn);
+
+  // Keep each package card's rows together, in the order the admin arranged
+  // them in the Prices tab.
+  const grouped: { heading: string; subtitle?: string; rows: PackageOption[] }[] = [];
+  for (const option of packages) {
+    const last = grouped[grouped.length - 1];
+    if (last && last.heading === option.title && last.subtitle === option.subtitle) {
+      last.rows.push(option);
+    } else {
+      grouped.push({ heading: option.title, subtitle: option.subtitle, rows: [option] });
+    }
+  }
+
+  return (
+    <div className="space-y-5">
+      {dropIns.length > 0 && (
+        <PackageGroup heading="Single class" rows={dropIns} selectedId={selectedId} onSelect={onSelect} />
+      )}
+      {grouped.map((group, i) => (
+        <PackageGroup
+          key={`${group.heading}-${group.subtitle ?? ""}-${i}`}
+          heading={group.heading}
+          subtitle={group.subtitle}
+          rows={group.rows}
+          selectedId={selectedId}
+          onSelect={onSelect}
+        />
+      ))}
+    </div>
+  );
+}
+
+function PackageGroup({
+  heading,
+  subtitle,
+  rows,
+  selectedId,
+  onSelect,
+}: {
+  heading: string;
+  subtitle?: string;
+  rows: PackageOption[];
+  selectedId: string | null;
+  onSelect: (id: string) => void;
+}) {
+  return (
+    <div>
+      <div className="flex flex-wrap items-baseline gap-x-2 mb-2">
+        <span className="text-xs uppercase tracking-widest text-primary-dark font-medium">
+          {heading}
+        </span>
+        {subtitle && <span className="text-xs text-stone-400">{subtitle}</span>}
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        {rows.map((option) => {
+          const isSelected = selectedId === option.id;
+          return (
+            <label
+              key={option.id}
+              className={`flex items-start gap-3 border rounded-sm p-3 sm:p-3.5 cursor-pointer transition-all ${
+                isSelected
+                  ? "border-primary bg-primary/5"
+                  : "border-stone-200 hover:border-primary/50 hover:bg-stone-50"
+              }`}
+            >
+              <input
+                type="radio"
+                name="package"
+                value={option.id}
+                checked={isSelected}
+                onChange={() => onSelect(option.id)}
+                className="mt-0.5 w-4 h-4 accent-[var(--color-primary,#8a6a4f)] shrink-0"
+              />
+              <span className="min-w-0 flex-1">
+                <span className="flex flex-wrap items-baseline justify-between gap-x-3">
+                  <span className="text-sm text-stone-700">{option.tierLabel}</span>
+                  <span className="text-sm font-medium text-primary-dark whitespace-nowrap">
+                    {option.priceLabel} ETB
+                  </span>
+                </span>
+                {option.note && (
+                  <span className="block text-xs text-stone-400 mt-0.5">{option.note}</span>
+                )}
+              </span>
+            </label>
+          );
+        })}
+      </div>
     </div>
   );
 }

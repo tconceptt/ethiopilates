@@ -37,11 +37,26 @@ export default defineSchema({
     email: v.optional(v.string()),
     phone: v.optional(v.string()),
     package: v.string(),
+    /** Advance payment taken at booking, in ETB. */
     price: v.optional(v.number()),
+    // The package the guest signed up for, captured at booking time. Copied
+    // rather than referenced so later edits in the Prices tab never rewrite
+    // what someone already agreed to pay. Absent on member bookings (covered
+    // by their membership) and on rows created before packages existed.
+    packageTitle: v.optional(v.string()),
+    packageSubtitle: v.optional(v.string()),
+    packageTier: v.optional(v.string()),
+    /** Full package price in ETB, or absent when the price row isn't a number. */
+    packagePrice: v.optional(v.number()),
+    /** Price exactly as written in the Prices tab, e.g. "From 30,000". */
+    packagePriceLabel: v.optional(v.string()),
     schedule: v.optional(v.string()),
     experienceLevel: v.optional(v.string()),
     goals: v.optional(v.string()),
     status: v.string(), // e.g., "pending", "confirmed", "contacted", "paid", "cancelled"
+    /** What the admin actually recorded when marking the booking paid. */
+    paidAmount: v.optional(v.number()),
+    paidInFull: v.optional(v.boolean()),
     isMember: v.optional(v.boolean()),
     classKey: v.optional(v.string()),
     classDate: v.optional(v.string()), // local YYYY-MM-DD
@@ -64,6 +79,9 @@ export default defineSchema({
     active: v.boolean(),
     showOnWeeklySchedule: v.boolean(),
     capacity: v.optional(v.number()),
+    // Which pricing packages the booking page offers for this class. Empty or
+    // absent means "no shortlist configured", and every package is offered.
+    pricingGroupIds: v.optional(v.array(v.id("pricingGroups"))),
     schedule: scheduleValidator,
   }).index("by_key", ["key"]),
 

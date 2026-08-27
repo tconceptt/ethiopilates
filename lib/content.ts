@@ -11,6 +11,7 @@ import {
   type SettingsContent,
 } from "../convex/defaults";
 import type { SiteClass } from "./classes";
+import type { PricingGroup } from "./pricing";
 
 /**
  * Site content comes from Convex once an admin has opened the dashboard (which
@@ -29,7 +30,7 @@ export function useClasses(): { classes: SiteClass[]; isLoading: boolean } {
 }
 
 export function usePricing(): {
-  groups: PricingGroupContent[];
+  groups: PricingGroup[];
   isLoading: boolean;
 } {
   const rows = useQuery(api.pricing.list);

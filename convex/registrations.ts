@@ -17,6 +17,11 @@ export const create = mutation({
     phone: v.optional(v.string()),
     package: v.string(),
     price: v.number(),
+    packageTitle: v.optional(v.string()),
+    packageSubtitle: v.optional(v.string()),
+    packageTier: v.optional(v.string()),
+    packagePrice: v.optional(v.number()),
+    packagePriceLabel: v.optional(v.string()),
     schedule: v.optional(v.string()),
     experienceLevel: v.optional(v.string()),
     goals: v.optional(v.string()),
@@ -65,5 +70,31 @@ export const updateStatus = mutation({
     await ctx.db.patch(args.id, {
       status: args.status,
     });
+  },
+});
+
+/**
+ * Record a payment against a booking.
+ *
+ * Guests pay the advance to hold the slot and settle the balance at the
+ * studio, so marking a booking paid defaults to the full package price.
+ * `paidInFull: false` records that only the advance came in.
+ */
+export const markPaid = mutation({
+  args: {
+    id: v.id("registrations"),
+    amount: v.number(),
+    paidInFull: v.boolean(),
+  },
+  handler: async (ctx, args) => {
+    if (!Number.isFinite(args.amount) || args.amount < 0) {
+      throw new Error("Payment amount must be zero or more.");
+    }
+    await ctx.db.patch(args.id, {
+      status: "paid",
+      paidAmount: Math.round(args.amount),
+      paidInFull: args.paidInFull,
+    });
+    return null;
   },
 });

@@ -77,14 +77,18 @@ export const update = mutation({
     active: v.boolean(),
     showOnWeeklySchedule: v.boolean(),
     capacity: v.union(v.number(), v.null()),
+    pricingGroupIds: v.array(v.id("pricingGroups")),
     schedule: scheduleValidator,
   },
   handler: async (ctx, args) => {
-    const { id, capacity, schedule, ...rest } = args;
+    const { id, capacity, pricingGroupIds, schedule, ...rest } = args;
     await ctx.db.patch(id, {
       ...rest,
       capacity:
         capacity === null ? undefined : Math.max(1, Math.floor(capacity)),
+      // Empty means "offer every package", which the booking page reads from
+      // an absent field — so don't store an empty array.
+      pricingGroupIds: pricingGroupIds.length ? pricingGroupIds : undefined,
       // Drop empty days so the weekly schedule and booking calendar don't have
       // to filter them out everywhere.
       schedule: schedule

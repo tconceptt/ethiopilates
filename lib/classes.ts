@@ -13,6 +13,8 @@ export type SiteClass = {
   active: boolean;
   showOnWeeklySchedule: boolean;
   capacity?: number;
+  /** Packages offered for this class. Empty/absent means "offer them all". */
+  pricingGroupIds?: string[];
   schedule: ScheduleDay[];
 };
 
