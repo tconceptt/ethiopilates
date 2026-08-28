@@ -77,7 +77,10 @@ export const update = mutation({
     active: v.boolean(),
     showOnWeeklySchedule: v.boolean(),
     capacity: v.union(v.number(), v.null()),
-    pricingGroupIds: v.array(v.id("pricingGroups")),
+    // Optional so an admin tab still running the previous bundle can save —
+    // its request has no such field. Absent means "leave the shortlist as it
+    // is", never "clear it", so an old client can't wipe the config.
+    pricingGroupIds: v.optional(v.array(v.id("pricingGroups"))),
     schedule: scheduleValidator,
   },
   handler: async (ctx, args) => {
@@ -88,7 +91,11 @@ export const update = mutation({
         capacity === null ? undefined : Math.max(1, Math.floor(capacity)),
       // Empty means "offer every package", which the booking page reads from
       // an absent field — so don't store an empty array.
-      pricingGroupIds: pricingGroupIds.length ? pricingGroupIds : undefined,
+      ...(pricingGroupIds === undefined
+        ? {}
+        : {
+            pricingGroupIds: pricingGroupIds.length ? pricingGroupIds : undefined,
+          }),
       // Drop empty days so the weekly schedule and booking calendar don't have
       // to filter them out everywhere.
       schedule: schedule
